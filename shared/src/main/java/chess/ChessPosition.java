@@ -8,12 +8,13 @@ package chess;
  */
 public class ChessPosition {
 
-    private int m_row;
-    private int m_col;
+    //final makes object immutable
+    private final int m_row;
+    private final int m_col;
 
     public ChessPosition(int row, int col) {
-        m_row = row;
-        m_col = col;
+        this.m_row = row;
+        this.m_col = col;
     }
 
     /**
