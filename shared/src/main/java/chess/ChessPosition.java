@@ -15,8 +15,8 @@ public class ChessPosition {
 
     public ChessPosition(int row, int col) {
         //final makes object immutable
-        this.m_row = row;
-        this.m_col col;
+        this.m_row = row-1;
+        this.m_col = col-1;
         }
 
 
