@@ -1,5 +1,7 @@
 package chess;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MyTests {
 
     public static void main(String [] args){
@@ -11,21 +13,32 @@ public class MyTests {
 //            }
 //        }
 
-        ChessBoard board1 = new ChessBoard();
-        ChessBoard board2 = new ChessBoard();
-
-        board1.resetBoard();
-        board2.resetBoard();
+//        ChessBoard board1 = new ChessBoard();
+//        ChessBoard board2 = new ChessBoard();
+//
+//        board1.resetBoard();
+//        board2.resetBoard();
 
 // Assuming board1 and board2 are initialized and populated
 
-        System.out.println("Hash code of board1: " + board1.hashCode());
-        System.out.println("Hash code of board2: " + board2.hashCode());
+//        System.out.println("Hash code of board1: " + board1.hashCode());
+//        System.out.println("Hash code of board2: " + board2.hashCode());
+//
+//        boolean isEqual = board1.equals(board2);
+//        System.out.println("Boards are equal: " + isEqual);
+//
+//        System.out.println(board1);
+//        System.out.println(board2);
 
-        boolean isEqual = board1.equals(board2);
-        System.out.println("Boards are equal: " + isEqual);
+        ChessPosition pos1 = new ChessPosition(1, 2);
+        ChessPosition pos2 = new ChessPosition(1, 2);
 
-        System.out.println(board1);
-        System.out.println(board2);
+        assertEquals(pos1, pos2);
+
+
+        System.out.println(pos1.hashCode());
+        System.out.println(pos2.hashCode());
+
+
     }
 }
