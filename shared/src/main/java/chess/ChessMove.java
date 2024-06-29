@@ -46,7 +46,7 @@ public class ChessMove {
 //        throw new RuntimeException("Not implemented");
         return m_promotionP;
     }
-
+//
     @Override
     public boolean equals(Object o){
         if (this == o) return true;
