@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -68,5 +69,10 @@ public class ChessMove {
     @Override
     public int hashCode() {
         return Objects.hash(m_startP, m_endP, m_promotionP);
+    }
+
+    @Override
+    public String toString() {
+        return "from " + m_startP + " to " + m_endP;
     }
 }

@@ -6,12 +6,15 @@ import java.util.Collection;
 public class PieceMovesCalculator {
 
     public PieceMovesCalculator(){
-
     }
 
-    private Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        throw new RuntimeException("Not implemented");
-        board.getPiece(myPosition).getPieceType();
-        return new ArrayList<>();
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> moves = new ArrayList<ChessMove>();
+        ChessPiece.PieceType piece = board.getPiece(myPosition).getPieceType();
+        if (piece == ChessPiece.PieceType.BISHOP) {
+            BishopMove bMoves = new BishopMove();
+            moves = bMoves.pieceMoves(board, myPosition);
+        }
+        return moves;
     }
 }

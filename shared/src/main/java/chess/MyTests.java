@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MyTests {
@@ -30,14 +33,20 @@ public class MyTests {
 //        System.out.println(board1);
 //        System.out.println(board2);
 
-        ChessPosition pos1 = new ChessPosition(1, 2);
-        ChessPosition pos2 = new ChessPosition(1, 2);
+//        ChessPosition pos1 = new ChessPosition(1, 2);
+//        ChessPosition pos2 = new ChessPosition(1, 2);
+//
+//        assertEquals(pos1, pos2);
+//
+//
+//        System.out.println(pos1.hashCode());
+//        System.out.println(pos2.hashCode());
 
-        assertEquals(pos1, pos2);
-
-
-        System.out.println(pos1.hashCode());
-        System.out.println(pos2.hashCode());
+        ChessBoard board = new ChessBoard();
+        board.addPiece(new ChessPosition(5, 4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
+        BishopMove bishop = new BishopMove();
+        Collection<ChessMove> moves = bishop.pieceMoves(board, new ChessPosition(5,4));
+        System.out.println(moves);
 
 
     }

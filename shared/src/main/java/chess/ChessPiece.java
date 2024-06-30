@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor m_color;
+    private final ChessGame.TeamColor m_color;
     private ChessPiece.PieceType m_type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
@@ -57,8 +57,9 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 //        throw new RuntimeException("Not implemented");
+        PieceMovesCalculator moves = new PieceMovesCalculator();
         board.getPiece(myPosition).getPieceType();
-        return new ArrayList<>();
+        return moves.pieceMoves(board, myPosition);
     }
 
     @Override
