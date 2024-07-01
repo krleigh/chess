@@ -73,6 +73,6 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "from " + m_startP + " to " + m_endP;
+        return "from " + m_startP + " to " + m_endP + " " + m_promotionP + "\n";
     }
 }

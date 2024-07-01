@@ -26,8 +26,6 @@ public class BishopMove {
         int row = myPosition.getRow()+1;
         int col = myPosition.getColumn()+1;
 
-        ArrayList<ChessPosition> lookAt = new ArrayList<ChessPosition>();
-
         boolean FL = true;
         boolean FR = true;
         boolean BL = true;
