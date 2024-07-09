@@ -12,23 +12,18 @@ public class ChessGame {
 
     public ChessBoard m_board = new ChessBoard();
     public ChessGame.TeamColor m_teamTurn;
-    private int m_turn;
 
 
     public ChessGame() {
-
+        m_teamTurn = TeamColor.WHITE;
+        m_board.resetBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        if (m_turn % 2 == 0){
-            return TeamColor.BLACK;
-        } else {
-            return TeamColor.BLACK;
-        }
-
+        return m_teamTurn;
     }
 
     /**
@@ -37,7 +32,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        m_teamTurn = team;
     }
 
     /**
@@ -76,7 +71,22 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean check = false;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                ChessPosition currPos = new ChessPosition(i, j);
+                ChessPiece piece = m_board.getPiece(currPos);
+                if (piece != null && piece.getTeamColor() != teamColor){
+                    for (ChessMove move : piece.pieceMoves(m_board, currPos)){
+                        ChessPiece target = m_board.getPiece(move.getEndPosition());
+                        if (target != null && target.getPieceType() == ChessPiece.PieceType.KING){
+                            check = true;
+                        }
+                    }
+                }
+            }
+        }
+        return check;
     }
 
     /**
@@ -86,7 +96,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -97,7 +107,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -106,8 +116,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        m_board.resetBoard();
-
+        m_board = board;
     }
 
     /**

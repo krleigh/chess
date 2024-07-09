@@ -46,7 +46,7 @@ public class MyTests {
         board.addPiece(new ChessPosition(5, 4), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP));
         BishopMove bishop = new BishopMove();
         Collection<ChessMove> moves = bishop.pieceMoves(board, new ChessPosition(5,4));
-        System.out.println(moves);
+//        System.out.println(moves);
 
 
     }

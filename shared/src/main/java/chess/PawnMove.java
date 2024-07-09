@@ -29,7 +29,7 @@ public class PawnMove {
         int row = myPosition.getRow()+1;
         int col = myPosition.getColumn()+1;
         ChessGame.TeamColor color = board.getPiece(myPosition).getTeamColor();
-        System.out.println(color + " " + row + ", " + col);
+//        System.out.println(color + " " + row + ", " + col);
 
         // Possible positions
 
