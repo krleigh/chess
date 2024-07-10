@@ -1,5 +1,7 @@
 package chess;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -64,6 +66,24 @@ public class ChessGame {
         throw new RuntimeException("Not implemented");
     }
 
+    private boolean checkForCheck(ChessPosition position, TeamColor teamColor){
+        boolean check = false;
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currPos = new ChessPosition(i, j);
+                ChessPiece piece = m_board.getPiece(currPos);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    for (ChessMove move : piece.pieceMoves(m_board, currPos)) {
+                        if (position == move.getEndPosition()) {
+                            check = true;
+                        }
+                    }
+                }
+            }
+        }
+        return check;
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -89,6 +109,19 @@ public class ChessGame {
         return check;
     }
 
+    private ChessPosition findPiece(TeamColor teamColor, ChessPiece.PieceType pieceType){
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
+                ChessPosition currPos = new ChessPosition(i, j);
+                ChessPiece piece = m_board.getPiece(currPos);
+                if (piece != null && piece.getPieceType() == pieceType && piece.getTeamColor() == teamColor) {
+                    return currPos;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -96,7 +129,33 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return false;
+        boolean checkmate = false;
+
+        if (isInCheck(teamColor)) {
+            ChessPosition kingPos = findPiece(teamColor, ChessPiece.PieceType.KING);
+            if (findPiece(teamColor, ChessPiece.PieceType.KING) != null) {
+                ChessPiece king = m_board.getPiece(kingPos);
+                Collection<ChessMove> moves = king.pieceMoves(m_board, kingPos);
+                if (moves.isEmpty()) {
+                    checkmate = true;
+                } else {
+                    boolean validMove = false;
+                    for (ChessMove move : moves) {
+                        m_board.addPiece(move.getEndPosition(), new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+                        m_board.addPiece(move.getStartPosition(), null);
+                        if (!isInCheck(teamColor)) {
+                            validMove = true;
+                        }
+                        m_board.addPiece(move.getStartPosition(), new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+                        m_board.addPiece(move.getEndPosition(), null);
+                    }
+                    if (!validMove) {
+                        checkmate = true;
+                    }
+                }
+            }
+        }
+        return checkmate;
     }
 
     /**
