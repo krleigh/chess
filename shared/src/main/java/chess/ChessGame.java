@@ -1,6 +1,5 @@
 package chess;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -14,13 +13,16 @@ public class ChessGame {
 
     public ChessBoard m_board = new ChessBoard();
     public ChessGame.TeamColor m_teamTurn;
-    private boolean m_madeMove;
+
+//    private boolean m_castle_white;
+//    private boolean m_castle_black;
 
 
     public ChessGame() {
         m_teamTurn = TeamColor.WHITE;
         m_board.resetBoard();
-        m_madeMove = false;
+//        m_castle_white = true;
+//        m_castle_black = true;
     }
 
     /**
@@ -55,7 +57,7 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        ArrayList<ChessMove> validMoves = new ArrayList<ChessMove>();
+        ArrayList<ChessMove> validMoves = new ArrayList<>();
         ChessPiece piece = m_board.getPiece(startPosition);
         TeamColor teamColor = piece.getTeamColor();
         Collection<ChessMove> moves = piece.pieceMoves(m_board, startPosition);
@@ -72,6 +74,17 @@ public class ChessGame {
             m_board.addPiece(move.getEndPosition(), capturePiece);
 
         }
+
+//        if (teamColor == TeamColor.WHITE && m_castle_white == true){
+//            if (m_board.getPiece(new ChessPosition(8, 7)) == null && m_board.getPiece(new ChessPosition(8,6)) == null){
+//                validMoves.add(new ChessMove(new ChessPosition(8,5), new ChessPosition(8,6), null));
+//            }
+//        } else if (teamColor == TeamColor.BLACK && m_castle_black == true){
+//            if (m_board.getPiece(new ChessPosition(1,7)) == null && m_board.getPiece(new ChessPosition(1, 6)) == null){
+//                validMoves.add(new ChessMove())
+//            }
+//        }
+
         return validMoves;
     }
 
@@ -106,7 +119,24 @@ public class ChessGame {
             throw new InvalidMoveException();
         }
 
-//        System.out.println(m_board);
+//        TeamColor teamColor = piece.getTeamColor();
+//        ChessPiece.PieceType pieceType = piece.getPieceType();
+//        ChessPosition position = move.getStartPosition();
+//
+//        if (pieceType == ChessPiece.PieceType.ROOK){
+//            if (teamColor == TeamColor.BLACK && position == new ChessPosition(8, 8)){
+//                m_castle_black = false;
+//            } else if (teamColor == TeamColor.WHITE && position == new ChessPosition(1, 8)){
+//                m_castle_white = false;
+//            }
+//        } else if (pieceType == ChessPiece.PieceType.KING){
+//            if (teamColor == TeamColor.BLACK){
+//                m_castle_black = false;
+//            } else {
+//                m_castle_white = false;
+//            }
+//
+//        }
     }
 
 
@@ -162,10 +192,7 @@ public class ChessGame {
             ArrayList<ChessMove> moves = new ArrayList<>();
             Collection<ChessPosition> pieces = findPieces(teamColor);
             for (ChessPosition piecePos : pieces){
-                Collection<ChessMove> pieceMoves = validMoves(piecePos);
-                for (ChessMove move : pieceMoves){
-                    moves.add(move);
-                }
+                moves.addAll(validMoves(piecePos));
             }
             if (moves.isEmpty()){
                 checkmate = true;
@@ -182,7 +209,6 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        TeamColor teamTurn = getTeamTurn();
         boolean stalemate = false;
         ArrayList<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> pieces = findPieces(teamColor);

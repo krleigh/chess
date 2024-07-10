@@ -61,20 +61,14 @@ public class ChessPiece {
 
         MoveCalculator move;
 
-        if (type == PieceType.QUEEN){
-            move = new QueenMove(board, myPosition);
-        } else if (type == PieceType.BISHOP){
-            move = new BishopMove(board, myPosition);
-        } else if (type == PieceType.ROOK){
-            move = new RookMove(board, myPosition);
-        } else if (type == PieceType.KNIGHT){
-            move = new KnightMove(board, myPosition);
-        } else if (type == PieceType.KING){
-            move = new KingMove(board, myPosition);
-        } else if (type == PieceType.PAWN){
-            move = new PawnMove(board, myPosition);
-        } else {
-            throw new Error("invalid piece type");
+        switch (board.getPiece(myPosition).getPieceType()){
+            case KING -> move = new KingMove(board, myPosition);
+            case PAWN -> move = new PawnMove(board, myPosition);
+            case ROOK -> move = new RookMove(board, myPosition);
+            case BISHOP -> move = new BishopMove(board, myPosition);
+            case KNIGHT -> move = new KnightMove(board, myPosition);
+            case QUEEN -> move = new QueenMove(board, myPosition);
+            case null, default -> throw new Error("invalid piece type");
         }
 
         return move.moves();
