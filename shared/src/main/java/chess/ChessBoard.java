@@ -83,14 +83,17 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        ArrayList<String> printBoard = new ArrayList<String>();
-        for (int i = 1; i < 9; i++){
-            for (int j =1; j < 9; j++){
+        ArrayList<String> printBoard = new ArrayList<>();
+        for (int i = 8; i > 0; i--){
+            for (int j = 1; j < 9; j++){
                 var piece = this.getPiece(new ChessPosition(i, j));
                 if (piece == null){
-                    printBoard.add("empty" + "\n");
-                } else{
+                    printBoard.add("|"+ " " + "|");
+                } else {
                     printBoard.add(piece.toString());
+                }
+                if (j == 8){
+                    printBoard.add("\n");
                 }
 
             }

@@ -95,7 +95,18 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return  m_color +
-                " " + m_type + "\n";
+        String piece = "null";
+        switch (m_type){
+            case QUEEN -> piece = "|"+ "Q" + "|";
+            case ROOK -> piece ="|"+ "R" + "|";
+            case PAWN -> piece ="|"+ "P" + "|";
+            case KING -> piece ="|"+ "K" + "|";
+            case BISHOP -> piece ="|"+ "B" + "|";
+            case KNIGHT -> piece ="|"+ "N" + "|";
+        }
+        if (m_color == ChessGame.TeamColor.BLACK){
+            piece = piece.toLowerCase();
+        }
+        return  piece;
     }
 }

@@ -57,12 +57,18 @@ public abstract class MoveCalculator {
         int row = movpos.getRow() +1;
         int col = movpos.getColumn() +1;
 
+
         if (row < 1 || row > 8 || col < 1 || col > 8){
             return false;
-        } else if (m_board.getPiece(movpos) != null && m_color == m_board.getPiece(movpos).getTeamColor()){
-            return false;
         } else {
-            return true;
+            ChessPiece place = m_board.getPiece(movpos);
+            if (place != null) {place.getTeamColor();}
+            ChessGame.TeamColor myColor = m_color;
+            if (m_board.getPiece(movpos) != null && m_color == m_board.getPiece(movpos).getTeamColor()){
+                return false;
+            } else {
+                return true;
+            }
         }
 
     }
