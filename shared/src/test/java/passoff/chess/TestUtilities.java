@@ -58,6 +58,7 @@ public class TestUtilities {
                 }
             }
         }
+
         return board;
     }
 

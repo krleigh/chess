@@ -36,6 +36,7 @@ public class RookMove extends MoveCalculator{
 
             }
         }
+
         return moves;
     }
 }
