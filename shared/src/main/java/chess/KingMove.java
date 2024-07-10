@@ -1,135 +1,45 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-public class KingMove {
+public class KingMove extends MoveCalculator{
 
-    public KingMove(){
-
+    public KingMove(ChessBoard board, ChessPosition position){
+        super(board, position);
     }
 
-    private boolean validate(ChessBoard board, ChessPosition move, ChessPosition myPosition){
-        if (move.getRow()+1 > 8 || move.getColumn()+1 >8 || move.getRow()+1 < 1 || move.getColumn()+1 < 1){
-            return false;
-        }else {
-            if (board.getPiece(move) != null && board.getPiece(move).getTeamColor() == board.getPiece(myPosition).getTeamColor()) {
-                return false;
-            }
-            return true;
-        }
-    }
-
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-
-        // Create empty list of possible moves
+    public Collection<ChessMove> moves(){
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
 
-        // Store location of current piece
-        int row = myPosition.getRow()+1;
-        int col = myPosition.getColumn()+1;
+        for (int i = 1; i < 2; i++){
 
-        // Possible positions
+            positions.put(Location.F, new ChessPosition(m_row + i, m_col));
+            positions.put(Location.L, new ChessPosition(m_row, m_col - i));
+            positions.put(Location.R, new ChessPosition(m_row, m_col + i));
+            positions.put(Location.B, new ChessPosition(m_row - i, m_col));
 
-        boolean FL = true;
-        boolean F = true;
-        boolean FR = true;
-        boolean L = true;
-        boolean R = true;
-        boolean BL = true;
-        boolean B = true;
-        boolean BR = true;
+            positions.put(Location.FL, new ChessPosition(m_row + i, m_col - i));
+            positions.put(Location.FR, new ChessPosition(m_row + i, m_col + i));
+            positions.put(Location.BL, new ChessPosition(m_row - i, m_col -i));
+            positions.put(Location.BR, new ChessPosition(m_row - i, m_col +i));
 
-        ChessPosition FLpos = new ChessPosition(row+1, col-1);
-        ChessPosition Fpos = new ChessPosition(row+1, col);
-        ChessPosition FRpos = new ChessPosition(row+1, col+1);
-        ChessPosition Lpos = new ChessPosition(row, col-1);
-        ChessPosition Rpos = new ChessPosition(row, col+1);
-        ChessPosition BLpos = new ChessPosition(row-1, col-1);
-        ChessPosition Bpos = new ChessPosition(row-1, col);
-        ChessPosition BRpos = new ChessPosition(row-1, col+1);
+            List<Location> locations = Arrays.asList(Location.F, Location.L, Location.R, Location.B,
+                    Location.FL, Location.FR, Location.BL, Location.BR);
 
-        // Check positions
-        if (validate(board, FLpos, myPosition)== false){
-            FL = false;
-        }
-        if (FL ==true){
-            moves.add(new ChessMove(myPosition, FLpos, null));
-            if (board.getPiece(FLpos) != null){
-                FL = false;
+            for (Location loc : locations){
+                if (!validate(positions.get(loc))){
+                    cont.put(loc, false);
+                } else if (cont.get(loc)){
+                    moves.add(new ChessMove(m_position, positions.get(loc), null));
+                    if (m_board.getPiece(positions.get(loc)) != null){
+                        cont.put(loc, false);
+                    }
+                }
             }
         }
-
-        if (validate(board, Fpos, myPosition)== false){
-            F = false;
-        }
-        if (F ==true){
-            moves.add(new ChessMove(myPosition, Fpos, null));
-            if (board.getPiece(Fpos) != null){
-                F = false;
-            }
-        }
-
-        if (validate(board, FRpos, myPosition)== false){
-            FR = false;
-        }
-        if (FR ==true){
-            moves.add(new ChessMove(myPosition, FRpos, null));
-            if (board.getPiece(FRpos) != null){
-                FR = false;
-            }
-        }
-
-        if (validate(board, Lpos, myPosition)== false){
-            L = false;
-        }
-        if (L ==true){
-            moves.add(new ChessMove(myPosition, Lpos, null));
-            if (board.getPiece(Lpos) != null){
-                L = false;
-            }
-        }
-
-        if (validate(board, Rpos, myPosition)== false){
-            R = false;
-        }
-        if (R ==true){
-            moves.add(new ChessMove(myPosition, Rpos, null));
-            if (board.getPiece(Rpos) != null){
-                R = false;
-            }
-        }
-
-        if (validate(board, BLpos, myPosition)== false){
-            BL = false;
-        }
-        if (BL ==true){
-            moves.add(new ChessMove(myPosition, BLpos, null));
-            if (board.getPiece(BLpos) != null){
-                BL = false;
-            }
-        }
-
-        if (validate(board, Bpos, myPosition)== false){
-            B = false;
-        }
-        if (B ==true){
-            moves.add(new ChessMove(myPosition, Bpos, null));
-            if (board.getPiece(Bpos) != null){
-                B = false;
-            }
-        }
-
-        if (validate(board, BRpos, myPosition)== false){
-            BR = false;
-        }
-        if (BR ==true){
-            moves.add(new ChessMove(myPosition, BRpos, null));
-            if (board.getPiece(BRpos) != null){
-                BR = false;
-            }
-        }
-
         return moves;
     }
 }

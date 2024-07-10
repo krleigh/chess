@@ -1,84 +1,41 @@
 package chess;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
-public class RookMove {
+public class RookMove extends MoveCalculator{
 
-    public RookMove(){
-
+    public RookMove(ChessBoard board, ChessPosition position){
+        super(board, position);
     }
 
-    private boolean validate(ChessBoard board, ChessPosition move, ChessPosition myPosition){
-        if (move.getRow()+1 > 8 || move.getColumn()+1 >8 || move.getRow()+1 < 1 || move.getColumn()+1 < 1){
-            return false;
-        }else {
-            if (board.getPiece(move) != null && board.getPiece(move).getTeamColor() == board.getPiece(myPosition).getTeamColor()) {
-                return false;
-            }
-            return true;
-        }
-    }
-
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> moves(){
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
-
-        int row = myPosition.getRow()+1;
-        int col = myPosition.getColumn()+1;
-
-        boolean F = true;
-        boolean L = true;
-        boolean R = true;
-        boolean B = true;
 
         for (int i = 1; i < 9; i++){
 
-            ChessPosition Fpos = new ChessPosition(row+i, col);
-            if (validate(board, Fpos, myPosition)== false){
-                F = false;
-            }
-            if (F==true){
-                moves.add(new ChessMove(myPosition, Fpos, null));
-                if (board.getPiece(Fpos) != null){
-                    F=false;
-                }
-            }
+            positions.put(Location.F, new ChessPosition(m_row + i, m_col));
+            positions.put(Location.L, new ChessPosition(m_row, m_col - i));
+            positions.put(Location.R, new ChessPosition(m_row, m_col + i));
+            positions.put(Location.B, new ChessPosition(m_row - i, m_col));
 
-            ChessPosition Lpos = new ChessPosition(row, col-i);
-            if (validate(board, Lpos, myPosition)== false){
-                L = false;
-            }
-            if (L==true) {moves.add(new ChessMove(
-                    myPosition, Lpos, null));
-                if (board.getPiece(Lpos) != null){
-                    L=false;
-                }
-            }
+            List<Location> locations = Arrays.asList(Location.F, Location.L, Location.R, Location.B);
 
-            ChessPosition Rpos = new ChessPosition(row, col+i);
-            if (validate(board, Rpos, myPosition)== false){
-                R = false;
-            }
-            if (R==true) {
-                moves.add(new ChessMove(myPosition, Rpos, null));
-                if (board.getPiece(Rpos) != null){
-                    R=false;
-                }
-            }
+            for (Location loc : locations){
 
-            ChessPosition Bpos = new ChessPosition(row-i, col);
-            if (validate(board, Bpos, myPosition)== false){
-                B = false;
-            }
-            if (B==true) {
-                moves.add(new ChessMove(myPosition, Bpos, null));
-                if (board.getPiece(Bpos) != null){
-                    B=false;
+                if (!validate(positions.get(loc))){
+                    cont.put(loc, false);
+                } else if (cont.get(loc)){
+                    moves.add(new ChessMove(m_position, positions.get(loc), null));
+                    if (m_board.getPiece(positions.get(loc)) != null){
+                        cont.put(loc, false);
+                    }
                 }
-            }
 
+            }
         }
-
         return moves;
     }
 }

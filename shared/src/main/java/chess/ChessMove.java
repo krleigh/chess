@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -11,30 +10,31 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    private ChessPosition m_startP;
-    private ChessPosition m_endP;
-    private ChessPiece.PieceType m_promotionP;
+    private ChessPosition m_start;
+    private ChessPosition m_end;
+    private ChessPiece.PieceType m_promP;
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
-        m_startP = startPosition;
-        m_endP = endPosition;
-        m_promotionP = promotionPiece;
+
+        m_start = startPosition;
+        m_end = endPosition;
+        m_promP = promotionPiece;
+
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-//        throw new RuntimeException("Not implemented");
-        return m_startP;
+        return m_start;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-//        throw new RuntimeException("Not implemented");
-        return m_endP;
+        return m_end;
     }
 
     /**
@@ -44,35 +44,26 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-//        throw new RuntimeException("Not implemented");
-        return m_promotionP;
+        return m_promP;
     }
-//
+
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) {return false;}
-        ChessMove that = (ChessMove) o;
-        boolean proP;
-        if (this.m_promotionP == null || that.m_promotionP == null) {
-           if (this.m_promotionP == null && that.m_promotionP == null){
-               proP = true;
-           } else{
-               proP = false;
-           }
-        } else {
-            proP  = this.m_promotionP.equals(that.m_promotionP);
-        }
-        return this.m_startP.equals(that.m_startP) && this.m_endP.equals(that.m_endP) && proP;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(m_start, chessMove.m_start) && Objects.equals(m_end, chessMove.m_end) && m_promP == chessMove.m_promP;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(m_startP, m_endP, m_promotionP);
+        return Objects.hash(m_start, m_end, m_promP);
     }
 
     @Override
     public String toString() {
-        return "from " + m_startP + " to " + m_endP + " " + m_promotionP + "\n";
+        return "from " + m_start +
+                " to " + m_end +
+                ", " + m_promP + "\n";
     }
 }

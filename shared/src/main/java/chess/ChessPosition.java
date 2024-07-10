@@ -10,22 +10,21 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private final int m_row;
-    private final int m_col;
+    private int m_row;
+    private int m_col;
 
     public ChessPosition(int row, int col) {
-        //final makes object immutable
-        this.m_row = row-1;
-        this.m_col = col-1;
-        }
 
+        m_row = row - 1;
+        m_col = col - 1;
+
+    }
 
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
      */
     public int getRow() {
-//        throw new RuntimeException("Not implemented");
         return m_row;
     }
 
@@ -34,7 +33,6 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-//        throw new RuntimeException("Not implemented");
         return m_col;
     }
 
@@ -53,6 +51,8 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "(" + (m_row+1) + ", " + (m_col+1) + ")";
+        return "(" + m_row +
+                ", " + m_col +
+                ')' + "\n";
     }
 }
