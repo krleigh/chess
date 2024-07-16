@@ -14,15 +14,9 @@ public class ChessGame {
     public ChessBoard m_board = new ChessBoard();
     public ChessGame.TeamColor m_teamTurn;
 
-//    private boolean m_castle_white;
-//    private boolean m_castle_black;
-
-
     public ChessGame() {
         m_teamTurn = TeamColor.WHITE;
         m_board.resetBoard();
-//        m_castle_white = true;
-//        m_castle_black = true;
     }
 
     /**
@@ -74,17 +68,6 @@ public class ChessGame {
             m_board.addPiece(move.getEndPosition(), capturePiece);
 
         }
-
-//        if (teamColor == TeamColor.WHITE && m_castle_white == true){
-//            if (m_board.getPiece(new ChessPosition(8, 7)) == null && m_board.getPiece(new ChessPosition(8,6)) == null){
-//                validMoves.add(new ChessMove(new ChessPosition(8,5), new ChessPosition(8,6), null));
-//            }
-//        } else if (teamColor == TeamColor.BLACK && m_castle_black == true){
-//            if (m_board.getPiece(new ChessPosition(1,7)) == null && m_board.getPiece(new ChessPosition(1, 6)) == null){
-//                validMoves.add(new ChessMove())
-//            }
-//        }
-
         return validMoves;
     }
 
@@ -118,25 +101,6 @@ public class ChessGame {
         } else {
             throw new InvalidMoveException();
         }
-
-//        TeamColor teamColor = piece.getTeamColor();
-//        ChessPiece.PieceType pieceType = piece.getPieceType();
-//        ChessPosition position = move.getStartPosition();
-//
-//        if (pieceType == ChessPiece.PieceType.ROOK){
-//            if (teamColor == TeamColor.BLACK && position == new ChessPosition(8, 8)){
-//                m_castle_black = false;
-//            } else if (teamColor == TeamColor.WHITE && position == new ChessPosition(1, 8)){
-//                m_castle_white = false;
-//            }
-//        } else if (pieceType == ChessPiece.PieceType.KING){
-//            if (teamColor == TeamColor.BLACK){
-//                m_castle_black = false;
-//            } else {
-//                m_castle_white = false;
-//            }
-//
-//        }
     }
 
 

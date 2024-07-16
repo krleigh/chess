@@ -42,9 +42,7 @@ public class PawnMove extends MoveCalculator{
                     } else{
                         moves.add(new ChessMove(m_position, positions.get(loc), null));
                     }
-
                 }
-
             }
         }
 
@@ -53,7 +51,6 @@ public class PawnMove extends MoveCalculator{
                 moves.add(new ChessMove(m_position, positions.get(Location.F2), null));
             }
         }
-
         return moves;
     }
 }
