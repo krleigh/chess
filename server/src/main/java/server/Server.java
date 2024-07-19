@@ -9,6 +9,8 @@ import spark.*;
 
 public class Server {
 
+    private final UserService userService = new UserService(new MemoryUserDAO());
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
@@ -17,6 +19,11 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         Spark.post("/user", this::registerUser);
+//        Spark.post("/pet", this::addPet);
+//        Spark.get("/pet", this::listPets);
+//        Spark.delete("/pet/:id", this::deletePet);
+        Spark.delete("/db", this::clear);
+
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -37,8 +44,13 @@ public class Server {
 
     private Object registerUser(Request req, Response res) {
         var user = new Gson().fromJson(req.body(), UserData.class);
-        UserService service = new UserService(new MemoryUserDAO());
-        user = service.registerUser(user);
+        userService.registerUser(user);
         return new Gson().toJson(user);
+    }
+
+    private Object clear(Request req, Response res) {
+        userService.deleteAllUsers();
+        res.status(204);
+        return "";
     }
 }
