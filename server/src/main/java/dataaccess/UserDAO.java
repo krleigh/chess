@@ -1,4 +1,8 @@
 package dataaccess;
 
-public class UserDAO {
+import model.UserData;
+
+public interface UserDAO {
+
+    UserData registerUser(UserData user);
 }
