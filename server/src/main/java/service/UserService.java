@@ -1,35 +1,46 @@
 package service;
 
+import dataaccess.AuthDAO;
 import dataaccess.UserDAO;
+import model.AuthData;
 import model.UserData;
 
 import java.util.Collection;
 
 public class UserService {
 
-    private final UserDAO dataAccess;
+    private final UserDAO userDAO;
+    private final AuthDAO authDAO;
 
-    public UserService(UserDAO dataAccess) {
-        this.dataAccess = dataAccess;
+    public UserService(UserDAO userDAO, AuthDAO authDAO) {
+        this.userDAO = userDAO;
+        this.authDAO = authDAO;
     }
 
-    public UserData registerUser(UserData user) {
-        return dataAccess.registerUser(user);
+    public RegisterResult registerUser(RegisterRequest register) {
+
+        if (userDAO.getUser(register.username()) == null) {
+           UserData user = userDAO.createUser(register);
+           AuthData auth = authDAO.createAuth(register.username());
+           return new RegisterResult(user.username(), auth.authToken());
+        } else {
+            return new RegisterResult(null, null);
+        }
     }
 
     public Collection<UserData> listUsers() {
-        return dataAccess.listUsers();
+        return userDAO.listUsers();
     }
 
     public UserData getUser(String username) {
-        return dataAccess.getUser(username);
+        return userDAO.getUser(username);
     }
 
-    public void deletePet(String username)  {
-        dataAccess.deleteUser(username);
+    public void deleteUser(String username)  {
+        userDAO.deleteUser(username);
     }
 
     public void deleteAllUsers() {
-        dataAccess.deleteAllUsers();
+        userDAO.deleteAllUsers();
     }
 }

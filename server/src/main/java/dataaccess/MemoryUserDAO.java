@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import service.RegisterRequest;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,8 +10,8 @@ public class MemoryUserDAO implements UserDAO {
 
     final private HashMap<String,UserData> users = new HashMap<>();
 
-    public UserData registerUser(UserData user) {
-        user = new UserData(user.username(), user.password(), user.email());
+    public UserData createUser(RegisterRequest register) {
+        UserData user = new UserData(register.username(), register.password(), register.email());
 
         users.put(user.username(), user);
         return user;

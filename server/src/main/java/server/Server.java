@@ -1,15 +1,18 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
+import model.AuthData;
+import service.RegisterRequest;
 import service.UserService;
 import model.UserData;
 import spark.*;
 
 public class Server {
 
-    private final UserService userService = new UserService(new MemoryUserDAO());
+    private final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -19,9 +22,13 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         Spark.post("/user", this::registerUser);
-//        Spark.post("/pet", this::addPet);
-//        Spark.get("/pet", this::listPets);
-//        Spark.delete("/pet/:id", this::deletePet);
+//        Spark.post("/session", this::login);
+//        Spark.delete("/session", this::logout);
+//
+//        Spark.get("/game", this::listGames);
+//        Spark.post("/game", this::createGame);
+//        Spark.put("/game", this::joinGame);
+
         Spark.delete("/db", this::clear);
 
 
@@ -43,10 +50,24 @@ public class Server {
     }
 
     private Object registerUser(Request req, Response res) {
-        var user = new Gson().fromJson(req.body(), UserData.class);
-        userService.registerUser(user);
-        return new Gson().toJson(user);
+        var register = new Gson().fromJson(req.body(), RegisterRequest.class);
+        return new Gson().toJson(userService.registerUser(register));
     }
+
+//    private Object login(Request req, Response res) {
+//        var user = new Gson().fromJson(req.body(), UserData.class);
+//        userService.login(user);
+//        return new Gson().toJson(user);
+//    }
+//
+//    private Object logout(Request req, Response res) {
+//
+//    }
+
+
+
+
+
 
     private Object clear(Request req, Response res) {
         userService.deleteAllUsers();

@@ -1,12 +1,13 @@
 package dataaccess;
 
 import model.UserData;
+import service.RegisterRequest;
 
 import java.util.Collection;
 
 public interface UserDAO {
 
-    UserData registerUser(UserData user);
+    UserData createUser(RegisterRequest register);
 
     Collection<UserData> listUsers();
 
