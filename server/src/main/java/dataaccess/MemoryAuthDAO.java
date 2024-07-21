@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
@@ -11,7 +12,7 @@ public class MemoryAuthDAO implements AuthDAO {
 
     final private HashMap<String,AuthData> auths = new HashMap<>();
 
-    public AuthData createAuth(String username) {
+    public AuthData createAuth(String username) throws ResponseException  {
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(authToken, username);
 
@@ -19,19 +20,19 @@ public class MemoryAuthDAO implements AuthDAO {
         return auth;
     }
 
-    public Collection<AuthData> listAuths() {
+    public Collection<AuthData> listAuths() throws ResponseException {
         return auths.values();
     }
 
-    public AuthData getAuth(String username) {
+    public AuthData getAuth(String username) throws ResponseException {
         return auths.get(username);
     }
 
-    public void deleteAuth(String username) {
+    public void deleteAuth(String username) throws ResponseException {
         auths.remove(username);
     }
 
-    public void deleteAllAuths() {
+    public void deleteAllAuths() throws ResponseException {
         auths.clear();
     }
 

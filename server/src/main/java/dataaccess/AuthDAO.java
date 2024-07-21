@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 
@@ -7,13 +8,13 @@ import java.util.Collection;
 
 public interface AuthDAO {
 
-    AuthData createAuth(String username);
+    AuthData createAuth(String username) throws ResponseException ;
 
-    Collection<AuthData> listAuths();
+    Collection<AuthData> listAuths() throws ResponseException ;
 
-    AuthData getAuth(String username);
+    AuthData getAuth(String username) throws ResponseException ;
 
-    void deleteAuth(String username);
+    void deleteAuth(String username) throws ResponseException ;
 
-    void deleteAllAuths();
+    void deleteAllAuths() throws ResponseException ;
 }

@@ -3,16 +3,16 @@ package server;
 import com.google.gson.Gson;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
-import model.AuthData;
+import exception.ResponseException;
+import service.ErrorResponse;
 import service.RegisterRequest;
 import service.UserService;
-import model.UserData;
 import spark.*;
 
 public class Server {
 
     private final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    private final Gson gson = new Gson();
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -30,6 +30,7 @@ public class Server {
 //        Spark.put("/game", this::joinGame);
 
         Spark.delete("/db", this::clear);
+        Spark.exception(ResponseException.class, this::exceptionHandler);
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -49,16 +50,23 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object registerUser(Request req, Response res) {
+    private void exceptionHandler(ResponseException ex, Request req, Response res) {
+        res.status(ex.StatusCode());
+        res.body(new Gson().toJson(new ErrorResponse(ex.StatusCode(), ex.getMessage())));
+    }
+
+    private Object registerUser(Request req, Response res) throws ResponseException {
         var register = new Gson().fromJson(req.body(), RegisterRequest.class);
+
         var registerResult = userService.registerUser(register);
         res.status(200);
         res.header("Auth Token: ", registerResult.authToken());
         res.body(new Gson().toJson(registerResult));
+
         return res.body();
     }
 
-//    private Object login(Request req, Response res) {
+//    private Object login(Request req, Response res) throws ResponseException {
 //        var user = new Gson().fromJson(req.body(), UserData.class);
 //        userService.login(user);
 //        return new Gson().toJson(user);
@@ -73,7 +81,7 @@ public class Server {
 
 
 
-    private Object clear(Request req, Response res) {
+    private Object clear(Request req, Response res) throws ResponseException {
         userService.deleteAllUsers();
         res.status(204);
         return "";

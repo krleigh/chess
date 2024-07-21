@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
+import exception.ResponseException;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,12 +18,12 @@ public class UserServiceTests {
     static final UserService service = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     @BeforeEach
-    void clear() {
+    void clear() throws ResponseException {
         service.deleteAllUsers();
     }
 
     @Test
-    void registerUserTest() {
+    void registerUserTest() throws ResponseException {
         var register = new RegisterRequest("lugan", "bbwhale", "whale@gwhale.com");
         var registerResult = service.registerUser(register);
         System.out.println(registerResult);
