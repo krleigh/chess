@@ -12,9 +12,9 @@ public interface AuthDAO {
 
     Collection<AuthData> listAuths() throws ResponseException ;
 
-    AuthData getAuth(String username) throws ResponseException ;
+    AuthData getAuth(String authToken) throws ResponseException ;
 
-    void deleteAuth(String username) throws ResponseException ;
+    void deleteAuth(String authToken) throws ResponseException ;
 
     void deleteAllAuths() throws ResponseException ;
 }

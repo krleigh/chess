@@ -5,10 +5,7 @@ import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
-import service.requestresult.LoginRequest;
-import service.requestresult.LoginResult;
-import service.requestresult.RegisterRequest;
-import service.requestresult.RegisterResult;
+import service.requestresult.*;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -43,11 +40,30 @@ public class UserService {
             throw new ResponseException(401, "Error: unauthorized");
         }
 
-        AuthData auth = authDAO.getAuth(login.username());
-        if (auth == null) {
-            auth = authDAO.createAuth(login.username());
-        }
+//        AuthData auth = authDAO.getAuth(login.username());
+//        if (auth != null) {
+//            authDAO.deleteAuth(login.username());
+//        }
+        AuthData auth = authDAO.createAuth(login.username());
         return new LoginResult(login.username(), auth.authToken());
+    }
+
+    public void logout(String authToken) throws ResponseException {
+
+        if (authDAO.getAuth(authToken) == null ) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+
+        authDAO.deleteAuth(authToken);
+
+    }
+
+    public String authenticate(String authToken) throws ResponseException {
+        var auth = authDAO.getAuth(authToken);
+        if (auth == null ) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+        return auth.username();
     }
 
     public Collection<UserData> listUsers() throws ResponseException {

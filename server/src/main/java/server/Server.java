@@ -2,17 +2,21 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
-import service.requestresult.ErrorResult;
-import service.requestresult.LoginRequest;
-import service.requestresult.RegisterRequest;
+import model.GameData;
+import service.GameService;
+import service.requestresult.*;
 import service.UserService;
 import spark.*;
+
+import java.util.Map;
 
 public class Server {
 
     private final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    public final GameService gameService = new GameService(new MemoryGameDAO());
     private final Gson gson = new Gson();
 
     public int run(int desiredPort) {
@@ -24,10 +28,10 @@ public class Server {
 
         Spark.post("/user", this::registerUser);
         Spark.post("/session", this::login);
-//        Spark.delete("/session", this::logout);
-//        Spark.get("/game", this::listGames);
-//        Spark.post("/game", this::createGame);
-//        Spark.put("/game", this::joinGame);
+        Spark.delete("/session", this::logout);
+        Spark.get("/game", this::listGames);
+        Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
@@ -51,37 +55,69 @@ public class Server {
 
     private void exceptionHandler(ResponseException ex, Request req, Response res) {
         res.status(ex.StatusCode());
-        res.body(new Gson().toJson(new ErrorResult(ex.StatusCode(), ex.getMessage())));
+        res.body(gson.toJson(new ErrorResult(ex.StatusCode(), ex.getMessage())));
     }
 
     private Object registerUser(Request req, Response res) throws ResponseException {
-        var register = new Gson().fromJson(req.body(), RegisterRequest.class);
+        var register = gson.fromJson(req.body(), RegisterRequest.class);
 
         var registerResult = userService.registerUser(register);
         res.status(200);
-        res.header("Auth Token: ", registerResult.authToken());
-        res.body(new Gson().toJson(registerResult));
+        res.header("Authorization", registerResult.authToken());
+        res.body(gson.toJson(registerResult));
 
         return res.body();
     }
 
     private Object login(Request req, Response res) throws ResponseException {
-        var user = new Gson().fromJson(req.body(), LoginRequest.class);
+        var user = gson.fromJson(req.body(), LoginRequest.class);
         var loginResult = userService.login(user);
-        return new Gson().toJson(loginResult);
+        res.body(gson.toJson(loginResult));
+        return res.body();
     }
 
-//    private Object logout(Request req, Response res) {
-//
-//    }
+    private Object logout(Request req, Response res) throws ResponseException {
+        String authToken = req.headers("Authorization").toString();
+        userService.logout(authToken);
+        res.body(" ");
+        return res.body();
+    }
 
+    private Object createGame(Request req, Response res) throws ResponseException {
+        String authToken = req.headers("Authorization").toString();
+        var username = userService.authenticate(authToken);
 
+        var createRequest = gson.fromJson(req.body(), CreateRequest.class);
 
+        res.body(gson.toJson(gameService.createGame(username, createRequest)));
+        return res.body();
+    }
 
+    private Object joinGame(Request req, Response res) throws ResponseException {
+        String authToken = req.headers("Authorization").toString();
+        var username = userService.authenticate(authToken);
 
+        var joinRequest = gson.fromJson(req.body(), JoinRequest.class);
+
+        gameService.joinGame(username, joinRequest);
+
+        res.body(" ");
+        return res.body();
+    }
+
+    private Object listGames(Request req, Response res) throws ResponseException {
+        String authToken = req.headers("Authorization").toString();
+        var username = userService.authenticate(authToken);
+
+        res.type("application/json");
+        var list = gameService.listGames();
+        GameListResult objList = new GameListResult(list);
+        return gson.toJson(objList);
+    }
 
     private Object clear(Request req, Response res) throws ResponseException {
         userService.deleteAllUsers();
+        gameService.deleteAllGames();
         res.status(200);
         return "";
     }

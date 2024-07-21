@@ -16,7 +16,7 @@ public class MemoryAuthDAO implements AuthDAO {
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(authToken, username);
 
-        auths.put(auth.username(), auth);
+        auths.put(auth.authToken(), auth);
         return auth;
     }
 
@@ -24,12 +24,12 @@ public class MemoryAuthDAO implements AuthDAO {
         return auths.values();
     }
 
-    public AuthData getAuth(String username) throws ResponseException {
-        return auths.get(username);
+    public AuthData getAuth(String authToken) throws ResponseException {
+        return auths.get(authToken);
     }
 
-    public void deleteAuth(String username) throws ResponseException {
-        auths.remove(username);
+    public void deleteAuth(String authToken) throws ResponseException {
+        auths.remove(authToken);
     }
 
     public void deleteAllAuths() throws ResponseException {
