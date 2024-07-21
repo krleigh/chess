@@ -51,7 +51,11 @@ public class Server {
 
     private Object registerUser(Request req, Response res) {
         var register = new Gson().fromJson(req.body(), RegisterRequest.class);
-        return new Gson().toJson(userService.registerUser(register));
+        var registerResult = userService.registerUser(register);
+        res.status(200);
+        res.header("Auth Token: ", registerResult.authToken());
+        res.body(new Gson().toJson(registerResult));
+        return res.body();
     }
 
 //    private Object login(Request req, Response res) {

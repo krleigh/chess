@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
 
-    static final UserService service = new UserService(new MemoryUserDAO());
+    static final UserService service = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     @BeforeEach
     void clear() {
@@ -22,13 +23,16 @@ public class UserServiceTests {
 
     @Test
     void registerUserTest() {
-        var user = new UserData("lugan", "bbwhale", "whale@gwhale.com");
-        user = service.registerUser(user);
+        var register = new RegisterRequest("lugan", "bbwhale", "whale@gwhale.com");
+        var registerResult = service.registerUser(register);
+        System.out.println(registerResult);
 
         var users = service.listUsers();
         assertEquals(1, users.size());
-        assertTrue(users.contains(user));
+        assertTrue(users.contains(new UserData(register.username(), register.password(), register.email())));
     }
+
+
 
 
 }

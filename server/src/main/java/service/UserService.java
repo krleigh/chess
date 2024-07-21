@@ -38,9 +38,11 @@ public class UserService {
 
     public void deleteUser(String username)  {
         userDAO.deleteUser(username);
+        authDAO.deleteAuth(username);
     }
 
     public void deleteAllUsers() {
         userDAO.deleteAllUsers();
+        authDAO.deleteAllAuths();
     }
 }
