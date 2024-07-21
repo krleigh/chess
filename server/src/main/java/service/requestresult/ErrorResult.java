@@ -1,10 +1,10 @@
-package service;
+package service.requestresult;
 
-public class ErrorResponse {
+public class ErrorResult {
     private int statusCode;
     private String message;
 
-    public ErrorResponse(int statusCode, String message) {
+    public ErrorResult(int statusCode, String message) {
         this.statusCode = statusCode;
         this.message = message;
     }

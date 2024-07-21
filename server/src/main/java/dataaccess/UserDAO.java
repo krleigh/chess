@@ -2,7 +2,7 @@ package dataaccess;
 
 import exception.ResponseException;
 import model.UserData;
-import service.RegisterRequest;
+import service.requestresult.RegisterRequest;
 
 import java.util.Collection;
 

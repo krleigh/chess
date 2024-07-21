@@ -6,10 +6,7 @@ import exception.ResponseException;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.UserService;
-
-import java.util.ArrayList;
-import java.util.List;
+import service.requestresult.RegisterRequest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
