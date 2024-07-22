@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public interface GameDAO {
 
-    GameData createGame(String username, CreateRequest request) throws ResponseException;
+    GameData createGame(CreateRequest request) throws ResponseException;
 
     GameData[] listGames() throws ResponseException;
 

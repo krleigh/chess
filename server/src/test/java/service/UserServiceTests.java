@@ -30,6 +30,16 @@ public class UserServiceTests {
         assertTrue(users.contains(new UserData(register.username(), register.password(), register.email())));
     }
 
+    @Test
+    void registerBadRequestTest() throws ResponseException {
+        var register = new RegisterRequest(null, null, "hello@world.com");
+        Exception exception = assertThrows(ResponseException.class, () -> {
+            service.registerUser(register);
+        });
+        var users = service.listUsers();
+        assertEquals(0, users.size());
+    }
+
 
 
 

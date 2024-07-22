@@ -6,6 +6,7 @@ import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
 import model.GameData;
+import service.ClearService;
 import service.GameService;
 import service.requestresult.*;
 import service.UserService;
@@ -15,8 +16,13 @@ import java.util.Map;
 
 public class Server {
 
-    private final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
-    public final GameService gameService = new GameService(new MemoryGameDAO());
+    private final MemoryUserDAO userDAO = new MemoryUserDAO();
+    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
+    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
+
+    private final UserService userService = new UserService(userDAO, authDAO);
+    private final GameService gameService = new GameService(gameDAO);
+
     private final Gson gson = new Gson();
 
     public int run(int desiredPort) {
@@ -89,7 +95,7 @@ public class Server {
 
         var createRequest = gson.fromJson(req.body(), CreateRequest.class);
 
-        res.body(gson.toJson(gameService.createGame(username, createRequest)));
+        res.body(gson.toJson(gameService.createGame(createRequest)));
         return res.body();
     }
 
@@ -116,8 +122,7 @@ public class Server {
     }
 
     private Object clear(Request req, Response res) throws ResponseException {
-        userService.deleteAllUsers();
-        gameService.deleteAllGames();
+        new ClearService(userDAO, authDAO, gameDAO).clear();
         res.status(200);
         return "";
     }

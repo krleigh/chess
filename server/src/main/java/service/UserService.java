@@ -39,11 +39,6 @@ public class UserService {
         if(user == null || !Objects.equals(user.password(), login.password())) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-
-//        AuthData auth = authDAO.getAuth(login.username());
-//        if (auth != null) {
-//            authDAO.deleteAuth(login.username());
-//        }
         AuthData auth = authDAO.createAuth(login.username());
         return new LoginResult(login.username(), auth.authToken());
     }
@@ -53,7 +48,6 @@ public class UserService {
         if (authDAO.getAuth(authToken) == null ) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-
         authDAO.deleteAuth(authToken);
 
     }

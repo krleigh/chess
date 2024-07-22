@@ -21,9 +21,9 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public CreateResult createGame(String username, CreateRequest request) throws ResponseException {
+    public CreateResult createGame(CreateRequest request) throws ResponseException {
 
-        var game = gameDAO.createGame(username, request);
+        var game = gameDAO.createGame(request);
 
         return new CreateResult(game.gameID());
     }

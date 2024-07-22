@@ -15,7 +15,7 @@ public class MemoryGameDAO implements GameDAO{
     final private HashMap<Integer, GameData> games = new HashMap<>();
     private int nextID = 1;
 
-    public GameData createGame(String username, CreateRequest request) throws ResponseException {
+    public GameData createGame(CreateRequest request) throws ResponseException {
         GameData game = new GameData(nextID++, null, null, request.gameName(), new ChessGame());
 
         games.put(game.gameID(), game);
