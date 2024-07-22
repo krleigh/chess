@@ -5,7 +5,6 @@ import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
-import model.GameData;
 import service.ClearService;
 import service.GameService;
 import service.requestresult.*;
@@ -85,7 +84,7 @@ public class Server {
     private Object logout(Request req, Response res) throws ResponseException {
         String authToken = req.headers("Authorization").toString();
         userService.logout(authToken);
-        res.body(" ");
+        res.body("{}");
         return res.body();
     }
 
@@ -107,7 +106,7 @@ public class Server {
 
         gameService.joinGame(username, joinRequest);
 
-        res.body(" ");
+        res.body("{}");
         return res.body();
     }
 
@@ -124,6 +123,6 @@ public class Server {
     private Object clear(Request req, Response res) throws ResponseException {
         new ClearService(userDAO, authDAO, gameDAO).clear();
         res.status(200);
-        return "";
+        return "{}";
     }
 }
