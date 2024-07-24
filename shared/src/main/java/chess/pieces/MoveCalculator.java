@@ -2,9 +2,7 @@ package chess.pieces;
 
 import chess.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class MoveCalculator {
 
@@ -73,6 +71,59 @@ public abstract class MoveCalculator {
             }
         }
 
+    }
+
+    public ArrayList<ChessMove> addDiagonalMoves(ArrayList<ChessMove> moves, int iterator) {
+        for (int i = 1; i < iterator; i++){
+
+            positions.put(Location.FL, new ChessPosition(mRow + i, mCol - i));
+            positions.put(Location.FR, new ChessPosition(mRow + i, mCol + i));
+            positions.put(Location.BL, new ChessPosition(mRow - i, mCol -i));
+            positions.put(Location.BR, new ChessPosition(mRow - i, mCol +i));
+
+            List<Location> locations = Arrays.asList(Location.FL, Location.FR, Location.BL, Location.BR);
+
+            for (Location loc : locations){
+
+                if (!validate(positions.get(loc))){
+                    cont.put(loc, false);
+                } else if (cont.get(loc)){
+                    moves.add(new ChessMove(mPosition, positions.get(loc), null));
+                    if (mBoard.getPiece(positions.get(loc)) != null){
+                        cont.put(loc, false);
+                    }
+                }
+
+            }
+        }
+        return moves;
+    }
+
+    public ArrayList<ChessMove> addStraightMoves(ArrayList<ChessMove> moves, int iterator) {
+        for (int i = 1; i < iterator; i++){
+
+            positions.put(Location.F, new ChessPosition(mRow + i, mCol));
+            positions.put(Location.L, new ChessPosition(mRow, mCol - i));
+            positions.put(Location.R, new ChessPosition(mRow, mCol + i));
+            positions.put(Location.B, new ChessPosition(mRow - i, mCol));
+
+            List<Location> locations = Arrays.asList(Location.F, Location.L, Location.R, Location.B);
+
+            for (Location loc : locations){
+
+                if (!validate(positions.get(loc))){
+                    cont.put(loc, false);
+                } else if (cont.get(loc)){
+                    moves.add(new ChessMove(mPosition, positions.get(loc), null));
+                    if (mBoard.getPiece(positions.get(loc)) != null){
+                        cont.put(loc, false);
+                    }
+                }
+
+            }
+        }
+
+        return moves;
     }
 
     public abstract Collection<ChessMove> moves();
