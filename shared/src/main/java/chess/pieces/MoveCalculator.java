@@ -73,34 +73,38 @@ public abstract class MoveCalculator {
 
     }
 
-    public ArrayList<ChessMove> addDiagonalMoves(ArrayList<ChessMove> moves, int iterator) {
-        for (int i = 1; i < iterator; i++){
+    public ArrayList<ChessMove> validateLocations(ArrayList<ChessMove> moves, List<Location> locations ) {
+        for (Location loc : locations){
 
-            positions.put(Location.FL, new ChessPosition(mRow + i, mCol - i));
-            positions.put(Location.FR, new ChessPosition(mRow + i, mCol + i));
-            positions.put(Location.BL, new ChessPosition(mRow - i, mCol -i));
-            positions.put(Location.BR, new ChessPosition(mRow - i, mCol +i));
-
-            List<Location> locations = Arrays.asList(Location.FL, Location.FR, Location.BL, Location.BR);
-
-            for (Location loc : locations){
-
-                if (!validate(positions.get(loc))){
+            if (!validate(positions.get(loc))){
+                cont.put(loc, false);
+            } else if (cont.get(loc)){
+                moves.add(new ChessMove(mPosition, positions.get(loc), null));
+                if (mBoard.getPiece(positions.get(loc)) != null){
                     cont.put(loc, false);
-                } else if (cont.get(loc)){
-                    moves.add(new ChessMove(mPosition, positions.get(loc), null));
-                    if (mBoard.getPiece(positions.get(loc)) != null){
-                        cont.put(loc, false);
-                    }
                 }
-
             }
         }
         return moves;
     }
 
+    public ArrayList<ChessMove> addDiagonalMoves(ArrayList<ChessMove> moves, int iterator) {
+        for (int i = 1; i < iterator; i++) {
+
+            positions.put(Location.FL, new ChessPosition(mRow + i, mCol - i));
+            positions.put(Location.FR, new ChessPosition(mRow + i, mCol + i));
+            positions.put(Location.BL, new ChessPosition(mRow - i, mCol - i));
+            positions.put(Location.BR, new ChessPosition(mRow - i, mCol + i));
+
+            List<Location> locations = Arrays.asList(Location.FL, Location.FR, Location.BL, Location.BR);
+
+            moves = validateLocations(moves, locations);
+        }
+        return moves;
+    }
+
     public ArrayList<ChessMove> addStraightMoves(ArrayList<ChessMove> moves, int iterator) {
-        for (int i = 1; i < iterator; i++){
+        for (int i = 1; i < iterator; i++) {
 
             positions.put(Location.F, new ChessPosition(mRow + i, mCol));
             positions.put(Location.L, new ChessPosition(mRow, mCol - i));
@@ -109,20 +113,8 @@ public abstract class MoveCalculator {
 
             List<Location> locations = Arrays.asList(Location.F, Location.L, Location.R, Location.B);
 
-            for (Location loc : locations){
-
-                if (!validate(positions.get(loc))){
-                    cont.put(loc, false);
-                } else if (cont.get(loc)){
-                    moves.add(new ChessMove(mPosition, positions.get(loc), null));
-                    if (mBoard.getPiece(positions.get(loc)) != null){
-                        cont.put(loc, false);
-                    }
-                }
-
-            }
+            moves = validateLocations(moves, locations);
         }
-
         return moves;
     }
 

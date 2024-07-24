@@ -15,7 +15,7 @@ public class KnightMove extends MoveCalculator{
         super(board, position);
     }
 
-    public Collection<ChessMove> moves(){
+    public Collection<ChessMove> moves() {
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
 
         positions.put(Location.FL, new ChessPosition(mRow + 2, mCol - 1));
@@ -30,17 +30,7 @@ public class KnightMove extends MoveCalculator{
         List<Location> locations = Arrays.asList(Location.LF, Location.RF, Location.LB, Location.RB,
                 Location.FL, Location.FR, Location.BL, Location.BR);
 
-        for (Location loc : locations) {
-
-            if (!validate(positions.get(loc))) {
-                cont.put(loc, false);
-            } else if (cont.get(loc)) {
-                moves.add(new ChessMove(mPosition, positions.get(loc), null));
-                if (mBoard.getPiece(positions.get(loc)) != null) {
-                    cont.put(loc, false);
-                }
-            }
-        }
+        moves = validateLocations(moves, locations);
         return moves;
     }
 }
