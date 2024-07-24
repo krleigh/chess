@@ -63,6 +63,10 @@ public class GameService {
         return game;
     }
 
+    public void deleteGame(int gameID) throws ResponseException {
+        gameDAO.deleteGame(gameID);
+    }
+
     public void deleteAllGames() throws ResponseException {
         gameDAO.deleteAllGames();
     }

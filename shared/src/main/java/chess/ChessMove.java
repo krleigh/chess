@@ -10,9 +10,9 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    private ChessPosition mStart;
-    private ChessPosition mEnd;
-    private ChessPiece.PieceType mPromP;
+    private final ChessPosition mStart;
+    private final ChessPosition mEnd;
+    private final ChessPiece.PieceType mPromP;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
@@ -49,8 +49,8 @@ public class ChessMove {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessMove chessMove = (ChessMove) o;
         return Objects.equals(mStart, chessMove.mStart) && Objects.equals(mEnd, chessMove.mEnd) && mPromP == chessMove.mPromP;
     }

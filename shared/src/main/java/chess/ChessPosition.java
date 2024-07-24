@@ -10,8 +10,8 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private int mRow;
-    private int mCol;
+    private final int mRow;
+    private final int mCol;
 
     public ChessPosition(int row, int col) {
 
@@ -38,8 +38,8 @@ public class ChessPosition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessPosition that = (ChessPosition) o;
         return mRow == that.mRow && mCol == that.mCol;
     }

@@ -14,8 +14,8 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor mColor;
-    private ChessPiece.PieceType mType;
+    private final ChessGame.TeamColor mColor;
+    private final ChessPiece.PieceType mType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
 
@@ -78,8 +78,8 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessPiece that = (ChessPiece) o;
         return mColor == that.mColor && mType == that.mType;
     }

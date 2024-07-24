@@ -98,6 +98,17 @@ public class GameServiceTests {
     }
 
     @Test
+    void deleteGame() throws ResponseException {
+        var result = GAME_SERVICE.createGame(new CreateRequest("a new game"));
+
+        assertEquals(1, GAME_SERVICE.listGames().length);
+
+        GAME_SERVICE.deleteGame(result.gameID());
+
+        assertEquals(0, GAME_SERVICE.listGames().length);
+    }
+
+    @Test
     void deleteAllGamesTest() throws ResponseException{
         GAME_SERVICE.createGame(new CreateRequest("game 01"));
         GAME_SERVICE.createGame(new CreateRequest("game 02"));
