@@ -117,13 +117,18 @@ public class ChessGame {
                 ChessPosition currPos = new ChessPosition(i, j);
                 ChessPiece piece = mBoard.getPiece(currPos);
                 if (piece != null && piece.getTeamColor() != teamColor){
-                    for (ChessMove move : piece.pieceMoves(mBoard, currPos)){
-                        ChessPiece target = mBoard.getPiece(move.getEndPosition());
-                        if (target != null && target.getPieceType() == ChessPiece.PieceType.KING){
-                            check = true;
-                        }
-                    }
+                     if (checkforCheck(piece, currPos, check)) {check = true;}
                 }
+            }
+        }
+        return check;
+    }
+
+    public boolean checkforCheck(ChessPiece piece, ChessPosition currPos, Boolean check) {
+        for (ChessMove move : piece.pieceMoves(mBoard, currPos)){
+            ChessPiece target = mBoard.getPiece(move.getEndPosition());
+            if (target != null && target.getPieceType() == ChessPiece.PieceType.KING){
+                check = true;
             }
         }
         return check;

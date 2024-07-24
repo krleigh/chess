@@ -33,17 +33,15 @@ public class PawnMove extends MoveCalculator{
                 ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK);
 
         for (Location loc : locations){
-            if (validate(positions.get(loc))){
-                if (loc == Location.F && mBoard.getPiece(positions.get(loc)) == null ||
-                        loc != Location.F && mBoard.getPiece(positions.get(loc)) != null){
-                    if (mColor == ChessGame.TeamColor.WHITE && positions.get(loc).getRow() + 1 == 8 ||
-                    mColor == ChessGame.TeamColor.BLACK && positions.get(loc).getRow() + 1 == 1){
-                        for (ChessPiece.PieceType piece : promPieces){
-                            moves.add(new ChessMove(mPosition, positions.get(loc), piece));
-                        }
-                    } else{
-                        moves.add(new ChessMove(mPosition, positions.get(loc), null));
+            if (validate(positions.get(loc)) && (loc == Location.F && mBoard.getPiece(positions.get(loc)) == null ||
+                    loc != Location.F && mBoard.getPiece(positions.get(loc)) != null)){
+                if (mColor == ChessGame.TeamColor.WHITE && positions.get(loc).getRow() + 1 == 8 ||
+                        mColor == ChessGame.TeamColor.BLACK && positions.get(loc).getRow() + 1 == 1){
+                    for (ChessPiece.PieceType piece : promPieces){
+                        moves.add(new ChessMove(mPosition, positions.get(loc), piece));
                     }
+                } else{
+                    moves.add(new ChessMove(mPosition, positions.get(loc), null));
                 }
             }
         }
