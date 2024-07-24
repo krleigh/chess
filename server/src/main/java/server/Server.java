@@ -61,6 +61,8 @@ public class Server {
         res.body(gson.toJson(new ErrorResult(ex.StatusCode(), ex.getMessage())));
     }
 
+
+
     private Object registerUser(Request req, Response res) throws ResponseException {
         var register = gson.fromJson(req.body(), RegisterRequest.class);
 

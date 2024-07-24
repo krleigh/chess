@@ -65,7 +65,11 @@ public class UserService {
     }
 
     public UserData getUser(String username) throws ResponseException {
-        return userDAO.getUser(username);
+        var user = userDAO.getUser(username);
+        if (user == null ) {
+            throw new ResponseException(401, "Error: unauthorized");
+        }
+        return user;
     }
 
     public Collection<AuthData> listAuths() throws ResponseException {
