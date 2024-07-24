@@ -68,6 +68,10 @@ public class UserService {
         return userDAO.getUser(username);
     }
 
+    public Collection<AuthData> listAuths() throws ResponseException {
+        return authDAO.listAuths();
+    }
+
     public void deleteUser(String username) throws ResponseException {
         userDAO.deleteUser(username);
         authDAO.deleteAuth(username);

@@ -11,8 +11,6 @@ import service.requestresult.*;
 import service.UserService;
 import spark.*;
 
-import java.util.Map;
-
 public class Server {
 
     private final MemoryUserDAO userDAO = new MemoryUserDAO();

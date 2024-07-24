@@ -12,6 +12,7 @@ import service.requestresult.GameListResult;
 import service.requestresult.JoinRequest;
 
 import java.util.Collection;
+import java.util.Objects;
 
 public class GameService {
 
@@ -22,9 +23,8 @@ public class GameService {
     }
 
     public CreateResult createGame(CreateRequest request) throws ResponseException {
-
+        if (Objects.equals(request.gameName(), "")) { throw new ResponseException(400, "Error: bad Request"); }
         var game = gameDAO.createGame(request);
-
         return new CreateResult(game.gameID());
     }
 
@@ -55,6 +55,12 @@ public class GameService {
 
     public GameData[] listGames() throws ResponseException {
         return gameDAO.listGames();
+    }
+
+    public GameData getGame(int gameID) throws ResponseException {
+        GameData game = gameDAO.getGame(gameID);
+        if (game == null) {throw new ResponseException(400, "Error: game does not exist");}
+        return game;
     }
 
     public void deleteAllGames() throws ResponseException {
