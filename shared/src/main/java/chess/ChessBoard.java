@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Arrays;
 
 /**
@@ -13,7 +12,7 @@ import java.util.Arrays;
 public class ChessBoard {
 
     //allocate a new empty 8x8 array of ChessPiece objects
-    private ChessPiece[][] m_board = new ChessPiece[8][8];
+    private ChessPiece[][] mBoard = new ChessPiece[8][8];
 
     public ChessBoard() {
         
@@ -27,7 +26,7 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
 
-        m_board[position.getRow()][position.getColumn()] = piece;
+        mBoard[position.getRow()][position.getColumn()] = piece;
     }
 
     /**
@@ -39,7 +38,7 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
 
-        return m_board[position.getRow()][position.getColumn()];
+        return mBoard[position.getRow()][position.getColumn()];
     }
 
     /**
@@ -48,7 +47,7 @@ public class ChessBoard {
      */
     public void resetBoard() {
 
-        m_board = new ChessPiece[8][8];
+        mBoard = new ChessPiece[8][8];
 
         for (ChessGame.TeamColor color : ChessGame.TeamColor.values()){
             int row = 1;
@@ -102,10 +101,10 @@ public class ChessBoard {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessBoard that = (ChessBoard) o;
-        return Arrays.deepEquals(this.m_board, that.m_board);
+        return Arrays.deepEquals(this.mBoard, that.mBoard);
     }
 
     @Override
-    public int hashCode() {return Arrays.deepHashCode(m_board);}
+    public int hashCode() {return Arrays.deepHashCode(mBoard);}
 
 }

@@ -1,4 +1,8 @@
-package chess;
+package chess.pieces;
+
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,10 +20,10 @@ public class RookMove extends MoveCalculator{
 
         for (int i = 1; i < 9; i++){
 
-            positions.put(Location.F, new ChessPosition(m_row + i, m_col));
-            positions.put(Location.L, new ChessPosition(m_row, m_col - i));
-            positions.put(Location.R, new ChessPosition(m_row, m_col + i));
-            positions.put(Location.B, new ChessPosition(m_row - i, m_col));
+            positions.put(Location.F, new ChessPosition(mRow + i, mCol));
+            positions.put(Location.L, new ChessPosition(mRow, mCol - i));
+            positions.put(Location.R, new ChessPosition(mRow, mCol + i));
+            positions.put(Location.B, new ChessPosition(mRow - i, mCol));
 
             List<Location> locations = Arrays.asList(Location.F, Location.L, Location.R, Location.B);
 
@@ -28,8 +32,8 @@ public class RookMove extends MoveCalculator{
                 if (!validate(positions.get(loc))){
                     cont.put(loc, false);
                 } else if (cont.get(loc)){
-                    moves.add(new ChessMove(m_position, positions.get(loc), null));
-                    if (m_board.getPiece(positions.get(loc)) != null){
+                    moves.add(new ChessMove(mPosition, positions.get(loc), null));
+                    if (mBoard.getPiece(positions.get(loc)) != null){
                         cont.put(loc, false);
                     }
                 }

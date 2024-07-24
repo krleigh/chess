@@ -11,19 +11,19 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessBoard m_board = new ChessBoard();
-    public ChessGame.TeamColor m_teamTurn;
+    public ChessBoard mBoard = new ChessBoard();
+    public ChessGame.TeamColor mTeamTurn;
 
     public ChessGame() {
-        m_teamTurn = TeamColor.WHITE;
-        m_board.resetBoard();
+        mTeamTurn = TeamColor.WHITE;
+        mBoard.resetBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return m_teamTurn;
+        return mTeamTurn;
     }
 
     /**
@@ -32,7 +32,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        m_teamTurn = team;
+        mTeamTurn = team;
     }
 
     /**
@@ -52,20 +52,20 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ArrayList<ChessMove> validMoves = new ArrayList<>();
-        ChessPiece piece = m_board.getPiece(startPosition);
+        ChessPiece piece = mBoard.getPiece(startPosition);
         TeamColor teamColor = piece.getTeamColor();
-        Collection<ChessMove> moves = piece.pieceMoves(m_board, startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(mBoard, startPosition);
         for(ChessMove move : moves){
-            ChessPiece capturePiece = m_board.getPiece(move.getEndPosition());
+            ChessPiece capturePiece = mBoard.getPiece(move.getEndPosition());
 
-            m_board.addPiece(move.getEndPosition(), piece);
-            m_board.addPiece(move.getStartPosition(), null);
+            mBoard.addPiece(move.getEndPosition(), piece);
+            mBoard.addPiece(move.getStartPosition(), null);
             if (!isInCheck(teamColor)) {
                 validMoves.add(move);
 
             }
-            m_board.addPiece(move.getStartPosition(), piece);
-            m_board.addPiece(move.getEndPosition(), capturePiece);
+            mBoard.addPiece(move.getStartPosition(), piece);
+            mBoard.addPiece(move.getEndPosition(), capturePiece);
 
         }
         return validMoves;
@@ -78,21 +78,21 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece piece = m_board.getPiece(move.getStartPosition());
+        ChessPiece piece = mBoard.getPiece(move.getStartPosition());
         if (piece != null ){
             Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
             TeamColor teamColor = piece.getTeamColor();
-            if (teamColor == m_teamTurn && validMoves.contains(move) ){
+            if (teamColor == mTeamTurn && validMoves.contains(move) ){
                 ChessPiece.PieceType promP = move.getPromotionPiece();
                 if(promP != null) {
                     piece = new ChessPiece (teamColor, promP);
                 }
-                m_board.addPiece(move.getEndPosition(), piece);
-                m_board.addPiece(move.getStartPosition(), null);
-                if (m_teamTurn == TeamColor.WHITE){
-                    m_teamTurn = TeamColor.BLACK;
+                mBoard.addPiece(move.getEndPosition(), piece);
+                mBoard.addPiece(move.getStartPosition(), null);
+                if (mTeamTurn == TeamColor.WHITE){
+                    mTeamTurn = TeamColor.BLACK;
                 } else {
-                    m_teamTurn = TeamColor.WHITE;
+                    mTeamTurn = TeamColor.WHITE;
                 }
 
             } else {
@@ -115,10 +115,10 @@ public class ChessGame {
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++){
                 ChessPosition currPos = new ChessPosition(i, j);
-                ChessPiece piece = m_board.getPiece(currPos);
+                ChessPiece piece = mBoard.getPiece(currPos);
                 if (piece != null && piece.getTeamColor() != teamColor){
-                    for (ChessMove move : piece.pieceMoves(m_board, currPos)){
-                        ChessPiece target = m_board.getPiece(move.getEndPosition());
+                    for (ChessMove move : piece.pieceMoves(mBoard, currPos)){
+                        ChessPiece target = mBoard.getPiece(move.getEndPosition());
                         if (target != null && target.getPieceType() == ChessPiece.PieceType.KING){
                             check = true;
                         }
@@ -134,7 +134,7 @@ public class ChessGame {
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++) {
                 ChessPosition currPos = new ChessPosition(i, j);
-                ChessPiece piece = m_board.getPiece(currPos);
+                ChessPiece piece = mBoard.getPiece(currPos);
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     pieces.add(currPos);
                 }
@@ -191,7 +191,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        m_board = board;
+        mBoard = board;
     }
 
     /**
@@ -200,6 +200,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        return m_board;
+        return mBoard;
     }
 }

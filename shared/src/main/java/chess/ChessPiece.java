@@ -1,6 +1,8 @@
 package chess;
 
 
+import chess.pieces.*;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -12,13 +14,13 @@ import java.util.Objects;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor m_color;
-    private ChessPiece.PieceType m_type;
+    private ChessGame.TeamColor mColor;
+    private ChessPiece.PieceType mType;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
 
-        m_color = pieceColor;
-        m_type = type;
+        mColor = pieceColor;
+        mType = type;
 
     }
 
@@ -38,14 +40,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return m_color;
+        return mColor;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return m_type;
+        return mType;
     }
 
     /**
@@ -79,18 +81,18 @@ public class ChessPiece {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessPiece that = (ChessPiece) o;
-        return m_color == that.m_color && m_type == that.m_type;
+        return mColor == that.mColor && mType == that.mType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(m_color, m_type);
+        return Objects.hash(mColor, mType);
     }
 
     @Override
     public String toString() {
         String piece = "null";
-        switch (m_type){
+        switch (mType){
             case QUEEN -> piece = "|"+ "Q" + "|";
             case ROOK -> piece ="|"+ "R" + "|";
             case PAWN -> piece ="|"+ "P" + "|";
@@ -98,7 +100,7 @@ public class ChessPiece {
             case BISHOP -> piece ="|"+ "B" + "|";
             case KNIGHT -> piece ="|"+ "N" + "|";
         }
-        if (m_color == ChessGame.TeamColor.BLACK){
+        if (mColor == ChessGame.TeamColor.BLACK){
             piece = piece.toLowerCase();
         }
         return  piece;

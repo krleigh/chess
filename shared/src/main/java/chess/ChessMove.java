@@ -10,16 +10,16 @@ import java.util.Objects;
  */
 public class ChessMove {
 
-    private ChessPosition m_start;
-    private ChessPosition m_end;
-    private ChessPiece.PieceType m_promP;
+    private ChessPosition mStart;
+    private ChessPosition mEnd;
+    private ChessPiece.PieceType mPromP;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
 
-        m_start = startPosition;
-        m_end = endPosition;
-        m_promP = promotionPiece;
+        mStart = startPosition;
+        mEnd = endPosition;
+        mPromP = promotionPiece;
 
     }
 
@@ -27,14 +27,14 @@ public class ChessMove {
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        return m_start;
+        return mStart;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        return m_end;
+        return mEnd;
     }
 
     /**
@@ -44,7 +44,7 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
-        return m_promP;
+        return mPromP;
     }
 
     @Override
@@ -52,18 +52,18 @@ public class ChessMove {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ChessMove chessMove = (ChessMove) o;
-        return Objects.equals(m_start, chessMove.m_start) && Objects.equals(m_end, chessMove.m_end) && m_promP == chessMove.m_promP;
+        return Objects.equals(mStart, chessMove.mStart) && Objects.equals(mEnd, chessMove.mEnd) && mPromP == chessMove.mPromP;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(m_start, m_end, m_promP);
+        return Objects.hash(mStart, mEnd, mPromP);
     }
 
     @Override
     public String toString() {
-        return "from " + m_start +
-                " to " + m_end +
-                ", " + m_promP + "\n";
+        return "from " + mStart +
+                " to " + mEnd +
+                ", " + mPromP + "\n";
     }
 }

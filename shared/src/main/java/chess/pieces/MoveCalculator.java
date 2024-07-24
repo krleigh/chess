@@ -1,4 +1,6 @@
-package chess;
+package chess.pieces;
+
+import chess.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -6,28 +8,28 @@ import java.util.Map;
 
 public abstract class MoveCalculator {
 
-    public ChessBoard m_board;
-    public ChessPosition m_position;
+    public ChessBoard mBoard;
+    public ChessPosition mPosition;
 
-    public ChessGame.TeamColor m_color;
-    public ChessPiece.PieceType m_type;
+    public ChessGame.TeamColor mColor;
+    public ChessPiece.PieceType mType;
 
-    public int m_row;
-    public int m_col;
+    public int mRow;
+    public int mCol;
 
     public Map<Location, Boolean> cont = new HashMap<Location, Boolean>();
     public Map<Location, ChessPosition> positions = new HashMap<Location, ChessPosition>();
 
     public MoveCalculator(ChessBoard board, ChessPosition position) {
 
-        m_board = board;
-        m_position = position;
+        mBoard = board;
+        mPosition = position;
 
-        m_color = board.getPiece(position).getTeamColor();
-        m_type = board.getPiece(position).getPieceType();
+        mColor = board.getPiece(position).getTeamColor();
+        mType = board.getPiece(position).getPieceType();
 
-        m_row = position.getRow() + 1;
-        m_col = position.getColumn() + 1;
+        mRow = position.getRow() + 1;
+        mCol = position.getColumn() + 1;
 
         for (Location loc : Location.values()){
             cont.put(loc, true);
@@ -61,10 +63,10 @@ public abstract class MoveCalculator {
         if (row < 1 || row > 8 || col < 1 || col > 8){
             return false;
         } else {
-            ChessPiece place = m_board.getPiece(movpos);
+            ChessPiece place = mBoard.getPiece(movpos);
             if (place != null) {place.getTeamColor();}
-            ChessGame.TeamColor myColor = m_color;
-            if (m_board.getPiece(movpos) != null && m_color == m_board.getPiece(movpos).getTeamColor()){
+            ChessGame.TeamColor myColor = mColor;
+            if (mBoard.getPiece(movpos) != null && mColor == mBoard.getPiece(movpos).getTeamColor()){
                 return false;
             } else {
                 return true;
