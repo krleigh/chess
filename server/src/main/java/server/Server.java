@@ -57,8 +57,8 @@ public class Server {
     }
 
     private void exceptionHandler(ResponseException ex, Request req, Response res) {
-        res.status(ex.StatusCode());
-        res.body(gson.toJson(new ErrorResult(ex.StatusCode(), ex.getMessage())));
+        res.status(ex.statusCode());
+        res.body(gson.toJson(new ErrorResult(ex.statusCode(), ex.getMessage())));
     }
 
 

@@ -12,27 +12,26 @@ import service.requestresult.RegisterRequest;
 import service.requestresult.RegisterResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
 
-    static final UserService service = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    static final UserService SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     @BeforeEach
     void clear() throws ResponseException {
-        service.deleteAllUsers();
+        SERVICE.deleteAllUsers();
     }
 
     @Test
     void registerUserTest() throws ResponseException {
         var register = new RegisterRequest("lugan", "bbwhale", "whale@gwhale.com");
-        var registerResult = service.registerUser(register);
+        var registerResult = SERVICE.registerUser(register);
         System.out.println(registerResult);
 
-        var users = service.listUsers();
+        var users = SERVICE.listUsers();
         assertEquals(1, users.size());
         assertTrue(users.contains(new UserData(register.username(), register.password(), register.email())));
     }
@@ -41,124 +40,124 @@ public class UserServiceTests {
     void registerBadRequestTest() throws ResponseException {
         var register = new RegisterRequest(null, null, "hello@world.com");
         Exception exception = assertThrows(ResponseException.class, () -> {
-            service.registerUser(register);
+            SERVICE.registerUser(register);
         });
-        var users = service.listUsers();
+        var users = SERVICE.listUsers();
         assertEquals(0, users.size());
     }
 
     @Test
     void loginTest() throws ResponseException {
-        RegisterResult result = service.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
-        service.logout(result.authToken());
-        service.login(new LoginRequest("lugan", "cutewhale"));
+        RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
+        SERVICE.logout(result.authToken());
+        SERVICE.login(new LoginRequest("lugan", "cutewhale"));
         AuthData[] auths = new AuthData[1];
-        service.listAuths().toArray(auths);
+        SERVICE.listAuths().toArray(auths);
         assertEquals("lugan", auths[0].username());
     }
 
     @Test
     void loginBadPasswordTest() throws ResponseException {
-        RegisterResult result = service.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
-        service.logout(result.authToken());
+        RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
+        SERVICE.logout(result.authToken());
         Exception exception = assertThrows(ResponseException.class, () -> {
-            service.login(new LoginRequest("lugan", "wrongpassword"));
+            SERVICE.login(new LoginRequest("lugan", "wrongpassword"));
         });
 
-        assertEquals(0, service.listAuths().size());
+        assertEquals(0, SERVICE.listAuths().size());
 
     }
 
     @Test
     void logoutTest() throws ResponseException {
-        RegisterResult result = service.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
-        assertEquals(1, service.listAuths().size());
-        service.logout(result.authToken());
-        assertEquals(0, service.listAuths().size());
+        RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
+        assertEquals(1, SERVICE.listAuths().size());
+        SERVICE.logout(result.authToken());
+        assertEquals(0, SERVICE.listAuths().size());
     }
 
     @Test
     void logoutNotAuthorizedTest() {
         Exception exception = assertThrows(ResponseException.class, () -> {
-            service.logout("1290");
+            SERVICE.logout("1290");
         });
     }
 
     @Test
     void authenticateTest() throws ResponseException {
-        RegisterResult result = service.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
-        assertEquals("lugan", service.authenticate(result.authToken()));
+        RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
+        assertEquals("lugan", SERVICE.authenticate(result.authToken()));
     }
 
     @Test
     void authenticateInvalidTest() throws ResponseException {
         Exception exception = assertThrows(ResponseException.class, () -> {
-            service.authenticate("1290");
+            SERVICE.authenticate("1290");
         });
     }
 
     @Test
     void listUsersTest() throws ResponseException {
         Collection<UserData> users = new ArrayList<>();
-        users.add(service.getUser(service.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com")).username()));
-        users.add(service.getUser(service.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com")).username()));
+        users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com")).username()));
+        users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com")).username()));
 
-        assertTrue(service.listUsers().containsAll(users));
+        assertTrue(SERVICE.listUsers().containsAll(users));
     }
 
     @Test
     void listUsersNoneTest() throws ResponseException {
-        assertEquals(0, service.listUsers().size());
+        assertEquals(0, SERVICE.listUsers().size());
     }
 
     @Test
     void listAuthsTest() throws ResponseException {
         Collection<AuthData> auths  = new ArrayList<>();
-        var lugan = service.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com"));
-        var ella = service.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com"));
+        var lugan = SERVICE.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com"));
+        var ella = SERVICE.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com"));
         auths.add(new AuthData(lugan.authToken(), lugan.username()));
         auths.add(new AuthData(ella.authToken(), ella.username()));
 
-        assertTrue(service.listAuths().containsAll(auths));
+        assertTrue(SERVICE.listAuths().containsAll(auths));
     }
 
     @Test
     void listAuthsNoneTest() throws ResponseException {
-        assertEquals(0, service.listAuths().size());
+        assertEquals(0, SERVICE.listAuths().size());
     }
 
     @Test
     void getUserTest() throws ResponseException {
-        var register = service.registerUser(new RegisterRequest("lugan", "whaleword", "whales@ewhal.com"));
-        assertEquals(new UserData("lugan", "whaleword", "whales@ewhal.com"), service.getUser(register.username()));
+        var register = SERVICE.registerUser(new RegisterRequest("lugan", "whaleword", "whales@ewhal.com"));
+        assertEquals(new UserData("lugan", "whaleword", "whales@ewhal.com"), SERVICE.getUser(register.username()));
     }
 
     @Test
     void getUserDoesNotExistTest() {
         Exception exception = assertThrows(ResponseException.class, () -> {
-            service.getUser("lugan");
+            SERVICE.getUser("lugan");
         });
     }
 
     @Test
     void deleteUser() throws ResponseException {
-        var register = service.registerUser(new RegisterRequest("lugan", "whaleword", "whale@ewhale.com"));
-        assertEquals(new UserData("lugan", "whaleword", "whale@ewhale.com"), service.getUser(register.username()));
-        service.deleteUser("lugan");
-        assertEquals(0, service.listUsers().size());
+        var register = SERVICE.registerUser(new RegisterRequest("lugan", "whaleword", "whale@ewhale.com"));
+        assertEquals(new UserData("lugan", "whaleword", "whale@ewhale.com"), SERVICE.getUser(register.username()));
+        SERVICE.deleteUser("lugan");
+        assertEquals(0, SERVICE.listUsers().size());
     }
 
     @Test
     void deleteAllUsersTest() throws ResponseException {
         Collection<UserData> users = new ArrayList<>();
-        users.add(service.getUser(service.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com")).username()));
-        users.add(service.getUser(service.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com")).username()));
+        users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com")).username()));
+        users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com")).username()));
 
-        assertTrue(service.listUsers().containsAll(users));
+        assertTrue(SERVICE.listUsers().containsAll(users));
 
-        service.deleteAllUsers();
+        SERVICE.deleteAllUsers();
 
-        assertEquals(0, service.listUsers().size());
+        assertEquals(0, SERVICE.listUsers().size());
     }
 
 

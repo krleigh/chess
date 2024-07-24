@@ -1,41 +1,36 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.GameDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
 import model.GameData;
-import model.UserData;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.requestresult.CreateRequest;
 import service.requestresult.JoinRequest;
-import service.requestresult.LoginRequest;
 import service.requestresult.RegisterRequest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTests {
 
-    static final GameService gameService = new GameService(new MemoryGameDAO());
-    static final UserService userService = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    static final GameService GAME_SERVICE = new GameService(new MemoryGameDAO());
+    static final UserService USER_SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     @BeforeEach
     void clear() throws ResponseException {
-        gameService.deleteAllGames();
-        userService.deleteAllUsers();
+        GAME_SERVICE.deleteAllGames();
+        USER_SERVICE.deleteAllUsers();
     }
 
     @Test
     void createGameTest() throws ResponseException {
-        gameService.createGame(new CreateRequest("My Cool New Game"));
-        var games = gameService.listGames();
+        GAME_SERVICE.createGame(new CreateRequest("My Cool New Game"));
+        var games = GAME_SERVICE.listGames();
 
         assertEquals(1, games.length);
         assertEquals("My Cool New Game", games[0].gameName());
@@ -44,75 +39,75 @@ public class GameServiceTests {
     @Test
     void createGameBadRequestTest() throws ResponseException {
         Exception exception = assertThrows(ResponseException.class, () -> {
-            gameService.createGame(new CreateRequest(""));
+            GAME_SERVICE.createGame(new CreateRequest(""));
         });
-        var games = gameService.listGames();
+        var games = GAME_SERVICE.listGames();
         assertEquals(0, games.length);
     }
 
     @Test
     void joinGameTest() throws ResponseException{
-        userService.registerUser(new RegisterRequest("lugan", "bbwhale", "whale@ghwale.com"));
-        int gameID = gameService.createGame(new CreateRequest("lugan's game")).gameID();
-        gameService.joinGame("lugan", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
+        USER_SERVICE.registerUser(new RegisterRequest("lugan", "bbwhale", "whale@ghwale.com"));
+        int gameID = GAME_SERVICE.createGame(new CreateRequest("lugan's game")).gameID();
+        GAME_SERVICE.joinGame("lugan", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
 
-        assertEquals("lugan", gameService.getGame(gameID).whiteUsername());
+        assertEquals("lugan", GAME_SERVICE.getGame(gameID).whiteUsername());
     }
 
     @Test
     void joinGameTakenColorTest() throws ResponseException{
-        userService.registerUser(new RegisterRequest("lugan", "bbwhale", "whale@ghwale.com"));
-        userService.registerUser(new RegisterRequest("ella", "elliphanti", "ele@phant.com"));
-        int gameID = gameService.createGame(new CreateRequest("lugan's game")).gameID();
-        gameService.joinGame("lugan", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
+        USER_SERVICE.registerUser(new RegisterRequest("lugan", "bbwhale", "whale@ghwale.com"));
+        USER_SERVICE.registerUser(new RegisterRequest("ella", "elliphanti", "ele@phant.com"));
+        int gameID = GAME_SERVICE.createGame(new CreateRequest("lugan's game")).gameID();
+        GAME_SERVICE.joinGame("lugan", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
 
         Exception exception = assertThrows(ResponseException.class, () -> {
-            gameService.joinGame("ella", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
+            GAME_SERVICE.joinGame("ella", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
         });
     }
 
     @Test
     void listGamesTest() throws ResponseException{
         ArrayList<GameData> expectedGames = new ArrayList<>();
-        expectedGames.add(gameService.getGame(gameService.createGame(new CreateRequest("cool game 01")).gameID()));
-        expectedGames.add(gameService.getGame(gameService.createGame(new CreateRequest("whale of a game")).gameID()));
-        expectedGames.add(gameService.getGame(gameService.createGame(new CreateRequest("hello whale")).gameID()));
-        expectedGames.add(gameService.getGame(gameService.createGame(new CreateRequest("my game")).gameID()));
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("cool game 01")).gameID()));
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("whale of a game")).gameID()));
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("hello whale")).gameID()));
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("my game")).gameID()));
 
-        assertArrayEquals(expectedGames.toArray(), gameService.listGames());
+        assertArrayEquals(expectedGames.toArray(), GAME_SERVICE.listGames());
 
     }
 
     @Test
     void listGamesNoGamesTest() throws  ResponseException{
         GameData[] empty = {};
-        assertArrayEquals(empty, gameService.listGames());
+        assertArrayEquals(empty, GAME_SERVICE.listGames());
     }
 
     @Test
     void getGameTest() throws ResponseException {
-        int gameID = gameService.createGame(new CreateRequest("my awesome game")).gameID();
-        assertEquals("my awesome game", gameService.getGame(gameID).gameName());
+        int gameID = GAME_SERVICE.createGame(new CreateRequest("my awesome game")).gameID();
+        assertEquals("my awesome game", GAME_SERVICE.getGame(gameID).gameName());
     }
 
     @Test
     void getGameDoesNotExistTest() throws ResponseException{
         Exception exception = assertThrows(ResponseException.class, () -> {
-            gameService.getGame(3);
+            GAME_SERVICE.getGame(3);
         });
     }
 
     @Test
     void deleteAllGamesTest() throws ResponseException{
-        gameService.createGame(new CreateRequest("game 01"));
-        gameService.createGame(new CreateRequest("game 02"));
-        gameService.createGame(new CreateRequest("game 03"));
+        GAME_SERVICE.createGame(new CreateRequest("game 01"));
+        GAME_SERVICE.createGame(new CreateRequest("game 02"));
+        GAME_SERVICE.createGame(new CreateRequest("game 03"));
 
-        assertEquals(3, gameService.listGames().length);
+        assertEquals(3, GAME_SERVICE.listGames().length);
 
-        gameService.deleteAllGames();
+        GAME_SERVICE.deleteAllGames();
 
-        assertEquals(0, gameService.listGames().length);
+        assertEquals(0, GAME_SERVICE.listGames().length);
 
 
     }
