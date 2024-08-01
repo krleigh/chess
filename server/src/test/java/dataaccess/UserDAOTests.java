@@ -1,4 +1,4 @@
-package passoff.dataaccess;
+package dataaccess;
 
 public class UserDAOTests {
 }
