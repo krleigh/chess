@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -63,7 +64,7 @@ public class Server {
 
 
 
-    private Object registerUser(Request req, Response res) throws ResponseException {
+    private Object registerUser(Request req, Response res) throws ResponseException, DataAccessException {
         var register = gson.fromJson(req.body(), RegisterRequest.class);
 
         var registerResult = userService.registerUser(register);
@@ -120,7 +121,7 @@ public class Server {
         return gson.toJson(objList);
     }
 
-    private Object clear(Request req, Response res) throws ResponseException {
+    private Object clear(Request req, Response res) throws ResponseException, DataAccessException {
         new ClearService(userDAO, authDAO, gameDAO).clear();
         res.status(200);
         return "{}";

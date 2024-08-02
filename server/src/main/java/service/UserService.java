@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.AuthData;
@@ -20,7 +21,7 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult registerUser(RegisterRequest register) throws ResponseException {
+    public RegisterResult registerUser(RegisterRequest register) throws ResponseException, DataAccessException {
 
         if (register.username() == null || register.password() == null || register.email() == null){
             throw new ResponseException(400, "Error: bad request");
@@ -81,7 +82,7 @@ public class UserService {
         authDAO.deleteAuth(username);
     }
 
-    public void deleteAllUsers() throws ResponseException {
+    public void deleteAllUsers() throws ResponseException, DataAccessException {
         userDAO.deleteAllUsers();
         authDAO.deleteAllAuths();
     }

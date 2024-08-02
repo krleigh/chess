@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public interface UserDAO {
 
-    UserData createUser(RegisterRequest register) throws ResponseException ;
+    UserData createUser(RegisterRequest register) throws ResponseException, DataAccessException;
 
     Collection<UserData> listUsers() throws ResponseException ;
 
@@ -16,5 +16,5 @@ public interface UserDAO {
 
     void deleteUser(String username) throws ResponseException ;
 
-    void deleteAllUsers() throws ResponseException ;
+    void deleteAllUsers() throws ResponseException, DataAccessException;
 }

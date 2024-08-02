@@ -1,6 +1,7 @@
 package service;
 
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -23,12 +24,12 @@ public class ClearServiceTests {
     static final GameService GAME_SERVICE = new GameService(GAME_DAO);
 
     @BeforeEach
-    void clear() throws ResponseException {
+    void clear() throws ResponseException, DataAccessException {
         CLEAR_SERVICE.clear();
     }
 
     @BeforeEach
-    void addObjects() throws ResponseException {
+    void addObjects() throws ResponseException, DataAccessException {
         USER_SERVICE.registerUser(new RegisterRequest("user1", "goodpassword", "my@email.com"));
         USER_SERVICE.registerUser(new RegisterRequest("coolcat", "123kittens", "mew@mew.com"));
         GAME_SERVICE.createGame(new CreateRequest("my game"));
@@ -36,7 +37,7 @@ public class ClearServiceTests {
     }
 
     @Test
-    void clearTest() throws ResponseException {
+    void clearTest() throws ResponseException, DataAccessException {
         var userlist = USER_SERVICE.listUsers();
         var authList = AUTH_DAO.listAuths();
         var gameList = GAME_DAO.listGames();

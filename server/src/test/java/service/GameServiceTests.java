@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
@@ -22,7 +23,7 @@ public class GameServiceTests {
     static final UserService USER_SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     @BeforeEach
-    void clear() throws ResponseException {
+    void clear() throws ResponseException, DataAccessException {
         GAME_SERVICE.deleteAllGames();
         USER_SERVICE.deleteAllUsers();
     }
@@ -46,7 +47,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameTest() throws ResponseException{
+    void joinGameTest() throws ResponseException, DataAccessException {
         USER_SERVICE.registerUser(new RegisterRequest("lugan", "bbwhale", "whale@ghwale.com"));
         int gameID = GAME_SERVICE.createGame(new CreateRequest("lugan's game")).gameID();
         GAME_SERVICE.joinGame("lugan", new JoinRequest(gameID, ChessGame.TeamColor.WHITE));
@@ -55,7 +56,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameTakenColorTest() throws ResponseException{
+    void joinGameTakenColorTest() throws ResponseException, DataAccessException {
         USER_SERVICE.registerUser(new RegisterRequest("lugan", "bbwhale", "whale@ghwale.com"));
         USER_SERVICE.registerUser(new RegisterRequest("ella", "elliphanti", "ele@phant.com"));
         int gameID = GAME_SERVICE.createGame(new CreateRequest("lugan's game")).gameID();

@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
@@ -21,12 +22,12 @@ public class UserServiceTests {
     static final UserService SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
 
     @BeforeEach
-    void clear() throws ResponseException {
+    void clear() throws ResponseException, DataAccessException {
         SERVICE.deleteAllUsers();
     }
 
     @Test
-    void registerUserTest() throws ResponseException {
+    void registerUserTest() throws ResponseException, DataAccessException {
         var register = new RegisterRequest("lugan", "bbwhale", "whale@gwhale.com");
         var registerResult = SERVICE.registerUser(register);
         System.out.println(registerResult);
@@ -47,7 +48,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void loginTest() throws ResponseException {
+    void loginTest() throws ResponseException, DataAccessException {
         RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
         SERVICE.logout(result.authToken());
         SERVICE.login(new LoginRequest("lugan", "cutewhale"));
@@ -57,7 +58,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void loginBadPasswordTest() throws ResponseException {
+    void loginBadPasswordTest() throws ResponseException, DataAccessException {
         RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
         SERVICE.logout(result.authToken());
         Exception exception = assertThrows(ResponseException.class, () -> {
@@ -69,7 +70,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void logoutTest() throws ResponseException {
+    void logoutTest() throws ResponseException, DataAccessException {
         RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
         assertEquals(1, SERVICE.listAuths().size());
         SERVICE.logout(result.authToken());
@@ -84,7 +85,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void authenticateTest() throws ResponseException {
+    void authenticateTest() throws ResponseException, DataAccessException {
         RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
         assertEquals("lugan", SERVICE.authenticate(result.authToken()));
     }
@@ -97,7 +98,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void listUsersTest() throws ResponseException {
+    void listUsersTest() throws ResponseException, DataAccessException {
         Collection<UserData> users = new ArrayList<>();
         users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com")).username()));
         users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com")).username()));
@@ -111,7 +112,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void listAuthsTest() throws ResponseException {
+    void listAuthsTest() throws ResponseException, DataAccessException {
         Collection<AuthData> auths  = new ArrayList<>();
         var lugan = SERVICE.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com"));
         var ella = SERVICE.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com"));
@@ -127,7 +128,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void getUserTest() throws ResponseException {
+    void getUserTest() throws ResponseException, DataAccessException {
         var register = SERVICE.registerUser(new RegisterRequest("lugan", "whaleword", "whales@ewhal.com"));
         assertEquals(new UserData("lugan", "whaleword", "whales@ewhal.com"), SERVICE.getUser(register.username()));
     }
@@ -140,7 +141,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void deleteUser() throws ResponseException {
+    void deleteUser() throws ResponseException, DataAccessException {
         var register = SERVICE.registerUser(new RegisterRequest("lugan", "whaleword", "whale@ewhale.com"));
         assertEquals(new UserData("lugan", "whaleword", "whale@ewhale.com"), SERVICE.getUser(register.username()));
         SERVICE.deleteUser("lugan");
@@ -148,7 +149,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void deleteAllUsersTest() throws ResponseException {
+    void deleteAllUsersTest() throws ResponseException, DataAccessException {
         Collection<UserData> users = new ArrayList<>();
         users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("lu", "password", "ewhale@gwhale.com")).username()));
         users.add(SERVICE.getUser(SERVICE.registerUser(new RegisterRequest("ella", "phantword", "trunk@peanut.com")).username()));
