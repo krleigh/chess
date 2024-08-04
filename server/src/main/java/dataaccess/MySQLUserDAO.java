@@ -7,6 +7,7 @@ import service.requestresult.RegisterRequest;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -27,7 +28,20 @@ public class MySQLUserDAO implements UserDAO {
     }
 
     public Collection<UserData> listUsers() throws ResponseException {
-        return null;
+        var result = new ArrayList<UserData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username, password, email FROM user";
+            try (var ps = conn.prepareStatement(statement)) {
+                try (var rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        result.add(readUser(rs));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
+        }
+        return result;
     }
 
     public UserData getUser(String username) throws ResponseException {
