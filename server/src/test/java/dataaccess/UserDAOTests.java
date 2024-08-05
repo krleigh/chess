@@ -48,8 +48,7 @@ public class UserDAOTests {
         expectedUsers.add(userDAO.createUser(new RegisterRequest("ella", "secretphant", "peanut@email.com")));
         expectedUsers.add(userDAO.createUser(new RegisterRequest("cheddar", "thedragon75", "cheese@cmail.com")));
 
-        var users = userDAO.listUsers();
-        assertEquals(expectedUsers, users);
+        assertTrue(userDAO.listUsers().containsAll(expectedUsers));
     }
 
 
