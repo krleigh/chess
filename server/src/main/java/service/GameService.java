@@ -1,10 +1,7 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.AuthDAO;
-import dataaccess.GameDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import exception.ResponseException;
 import model.GameData;
 import service.requestresult.CreateRequest;
@@ -20,7 +17,14 @@ public class GameService {
     private final GameDAO gameDAO;
 
     public GameService() {
-        this.gameDAO = new MemoryGameDAO();
+        GameDAO temp;
+        try {
+            temp = new MySQLGameDAO();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            temp = new MemoryGameDAO();
+        }
+        this.gameDAO = temp;
     }
 
     public CreateResult createGame(CreateRequest request) throws ResponseException {

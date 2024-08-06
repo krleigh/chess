@@ -17,7 +17,7 @@ public interface GameDAO {
 
     GameData updateGame(Integer gameID, GameData newGame) throws ResponseException;
 
-    void deleteGame(Integer username) throws ResponseException;
+    void deleteGame(Integer gameID) throws ResponseException;
 
     void deleteAllGames() throws ResponseException;
 }

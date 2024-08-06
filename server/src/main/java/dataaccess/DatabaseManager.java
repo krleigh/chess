@@ -1,5 +1,7 @@
 package dataaccess;
 
+import exception.ResponseException;
+
 import java.sql.*;
 import java.util.Properties;
 
@@ -69,4 +71,5 @@ public class DatabaseManager {
             throw new DataAccessException(e.getMessage());
         }
     }
+
 }

@@ -94,17 +94,13 @@ public class MySQLUserDAO implements UserDAO {
                 }
                 ps.executeUpdate();
 
-                if (params. length > 0) {
-                    try {
-                        var username = getUser(params[0].toString()).username();
-                        return username;
-                    } catch (Exception e ) {
-                        return null;
-                    }
 
-                } else {
+                try {
+                    return getUser(params[0].toString()).username();
+                } catch (Exception e ) {
                     return null;
                 }
+
             }
         } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
@@ -117,7 +113,6 @@ public class MySQLUserDAO implements UserDAO {
               `username` varchar(256) NOT NULL,
               `password` varchar(256) NOT NULL,
               `email` varchar(256) NOT NULL,
-              `json` TEXT DEFAULT NULL,
               PRIMARY KEY (`username`),
               INDEX(username),
               INDEX(password)
