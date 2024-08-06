@@ -1,10 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import exception.ResponseException;
 import service.ClearService;
 import service.GameService;
@@ -14,14 +11,15 @@ import spark.*;
 
 public class Server {
 
-    private final MemoryUserDAO userDAO = new MemoryUserDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    private final MemoryGameDAO gameDAO = new MemoryGameDAO();
-
-    private final UserService userService = new UserService(userDAO, authDAO);
-    private final GameService gameService = new GameService(gameDAO);
+    private final UserService userService;
+    private final GameService gameService;
 
     private final Gson gson = new Gson();
+
+    public Server()  {
+        userService = new UserService();
+        gameService = new GameService();
+    }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
@@ -38,6 +36,7 @@ public class Server {
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
         Spark.exception(ResponseException.class, this::exceptionHandler);
+
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
@@ -122,7 +121,7 @@ public class Server {
     }
 
     private Object clear(Request req, Response res) throws ResponseException, DataAccessException {
-        new ClearService(userDAO, authDAO, gameDAO).clear();
+        new ClearService(userService, gameService).clear();
         res.status(200);
         return "{}";
     }

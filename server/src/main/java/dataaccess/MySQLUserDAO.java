@@ -16,15 +16,20 @@ import static java.sql.Types.NULL;
 
 public class MySQLUserDAO implements UserDAO {
 
-    public MySQLUserDAO() throws ResponseException, DataAccessException {
+    public MySQLUserDAO() throws ResponseException {
         configureDatabase();
     }
 
 
-    public UserData createUser(RegisterRequest register) throws ResponseException, DataAccessException {
-        var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        var id = executeUpdate(statement, register.username(), register.password(), register.email());
-        return new UserData(id, register.password(), register.email());
+    public UserData createUser(RegisterRequest register) throws ResponseException {
+        try {
+            var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
+            var id = executeUpdate(statement, register.username(), register.password(), register.email());
+            return new UserData(id, register.password(), register.email());
+        } catch (Exception e) {
+            throw new ResponseException(500, String.format("Error: unable to read data: %s", e.getMessage()));
+        }
+
     }
 
     public Collection<UserData> listUsers() throws ResponseException {
@@ -61,11 +66,12 @@ public class MySQLUserDAO implements UserDAO {
         return null;
     }
 
-    public void deleteUser(String username) throws ResponseException {
-
+    public void deleteUser(String username) throws ResponseException{
+        var statement = "DELETE FROM user WHERE username=?";
+        executeUpdate(statement, username);
     }
 
-    public void deleteAllUsers() throws ResponseException, DataAccessException {
+    public void deleteAllUsers() throws ResponseException {
         var statement = "TRUNCATE user";
         executeUpdate(statement);
     }
@@ -78,7 +84,7 @@ public class MySQLUserDAO implements UserDAO {
     }
 
 
-    private String executeUpdate(String statement, Object... params) throws ResponseException, DataAccessException {
+    private String executeUpdate(String statement, Object... params) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement)) {
                 for (var i = 0; i < params.length; i++) {
@@ -95,7 +101,7 @@ public class MySQLUserDAO implements UserDAO {
                     return null;
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
         }
     }
@@ -115,15 +121,16 @@ public class MySQLUserDAO implements UserDAO {
     };
 
 
-    private void configureDatabase() throws ResponseException, DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
+    private void configureDatabase() throws ResponseException {
+        try { DatabaseManager.createDatabase();
+            try (var conn = DatabaseManager.getConnection()) {
+                for (var statement : createStatements) {
+                    try (var preparedStatement = conn.prepareStatement(statement)) {
+                        preparedStatement.executeUpdate();
+                    }
                 }
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | DataAccessException ex) {
             throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
         }
     }

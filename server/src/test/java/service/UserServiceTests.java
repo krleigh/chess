@@ -19,15 +19,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTests {
 
-    static final UserService SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    static final UserService SERVICE = new UserService();
 
     @BeforeEach
-    void clear() throws ResponseException, DataAccessException {
+    void clear() throws ResponseException {
         SERVICE.deleteAllUsers();
     }
 
     @Test
-    void registerUserTest() throws ResponseException, DataAccessException {
+    void registerUserTest() throws ResponseException {
         var register = new RegisterRequest("lugan", "bbwhale", "whale@gwhale.com");
         var registerResult = SERVICE.registerUser(register);
         System.out.println(registerResult);
@@ -48,7 +48,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void loginTest() throws ResponseException, DataAccessException {
+    void loginTest() throws ResponseException {
         RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
         SERVICE.logout(result.authToken());
         SERVICE.login(new LoginRequest("lugan", "cutewhale"));
@@ -58,7 +58,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void loginBadPasswordTest() throws ResponseException, DataAccessException {
+    void loginBadPasswordTest() throws ResponseException {
         RegisterResult result = SERVICE.registerUser(new RegisterRequest("lugan", "cutewhale", "whale@gwhale.com"));
         SERVICE.logout(result.authToken());
         Exception exception = assertThrows(ResponseException.class, () -> {

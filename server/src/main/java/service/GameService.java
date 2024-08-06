@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
+import dataaccess.MemoryGameDAO;
 import dataaccess.UserDAO;
 import exception.ResponseException;
 import model.GameData;
@@ -18,8 +19,8 @@ public class GameService {
 
     private final GameDAO gameDAO;
 
-    public GameService(GameDAO gameDAO) {
-        this.gameDAO = gameDAO;
+    public GameService() {
+        this.gameDAO = new MemoryGameDAO();
     }
 
     public CreateResult createGame(CreateRequest request) throws ResponseException {

@@ -19,8 +19,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTests {
 
-    static final GameService GAME_SERVICE = new GameService(new MemoryGameDAO());
-    static final UserService USER_SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    static final GameService GAME_SERVICE = new GameService();
+    static final UserService USER_SERVICE = new UserService();
 
     @BeforeEach
     void clear() throws ResponseException, DataAccessException {

@@ -15,13 +15,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearServiceTests {
 
-    private static final MemoryUserDAO USER_DAO = new MemoryUserDAO();
-    private static final MemoryAuthDAO AUTH_DAO = new MemoryAuthDAO();
-    private static final MemoryGameDAO GAME_DAO = new MemoryGameDAO();
 
-    static final ClearService CLEAR_SERVICE = new ClearService(USER_DAO, AUTH_DAO, GAME_DAO);
-    static final UserService USER_SERVICE = new UserService(USER_DAO, AUTH_DAO);
-    static final GameService GAME_SERVICE = new GameService(GAME_DAO);
+
+    static final UserService USER_SERVICE = new UserService();
+    static final GameService GAME_SERVICE = new GameService();
+    static final ClearService CLEAR_SERVICE = new ClearService(USER_SERVICE, GAME_SERVICE);
 
     @BeforeEach
     void clear() throws ResponseException, DataAccessException {
@@ -39,8 +37,8 @@ public class ClearServiceTests {
     @Test
     void clearTest() throws ResponseException, DataAccessException {
         var userlist = USER_SERVICE.listUsers();
-        var authList = AUTH_DAO.listAuths();
-        var gameList = GAME_DAO.listGames();
+        var authList = USER_SERVICE.listAuths();
+        var gameList = GAME_SERVICE.listGames();
 
         assertNotEquals(0, userlist.size());
         assertNotEquals(0, authList.size());
@@ -49,8 +47,8 @@ public class ClearServiceTests {
         CLEAR_SERVICE.clear();
 
         userlist = USER_SERVICE.listUsers();
-        authList = AUTH_DAO.listAuths();
-        gameList = GAME_DAO.listGames();
+        authList = USER_SERVICE.listAuths();
+        gameList = GAME_SERVICE.listGames();
 
         assertEquals(0, userlist.size());
         assertEquals(0, authList.size());

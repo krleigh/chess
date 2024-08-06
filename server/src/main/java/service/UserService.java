@@ -1,12 +1,11 @@
 package service;
 
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 import service.requestresult.*;
+import spark.Response;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -16,12 +15,12 @@ public class UserService {
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
 
-    public UserService(UserDAO userDAO, AuthDAO authDAO) {
-        this.userDAO = userDAO;
-        this.authDAO = authDAO;
+    public UserService() {
+        this.userDAO = new MemoryUserDAO();
+        this.authDAO = new MemoryAuthDAO();
     }
 
-    public RegisterResult registerUser(RegisterRequest register) throws ResponseException, DataAccessException {
+    public RegisterResult registerUser(RegisterRequest register) throws ResponseException{
 
         if (register.username() == null || register.password() == null || register.email() == null){
             throw new ResponseException(400, "Error: bad request");
@@ -77,12 +76,12 @@ public class UserService {
         return authDAO.listAuths();
     }
 
-    public void deleteUser(String username) throws ResponseException {
+    public void deleteUser(String username) throws ResponseException{
         userDAO.deleteUser(username);
         authDAO.deleteAuth(username);
     }
 
-    public void deleteAllUsers() throws ResponseException, DataAccessException {
+    public void deleteAllUsers() throws ResponseException{
         userDAO.deleteAllUsers();
         authDAO.deleteAllAuths();
     }
