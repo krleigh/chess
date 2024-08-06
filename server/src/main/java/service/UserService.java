@@ -16,7 +16,14 @@ public class UserService {
     private final AuthDAO authDAO;
 
     public UserService() {
-        this.userDAO = new MemoryUserDAO();
+        UserDAO temp;
+        try {
+            temp = new MySQLUserDAO();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            temp = new MemoryUserDAO();
+        }
+        this.userDAO = temp;
         this.authDAO = new MemoryAuthDAO();
     }
 

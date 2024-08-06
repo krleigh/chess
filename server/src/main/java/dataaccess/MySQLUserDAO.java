@@ -95,8 +95,13 @@ public class MySQLUserDAO implements UserDAO {
                 ps.executeUpdate();
 
                 if (params. length > 0) {
-                    var username = getUser(params[0].toString()).username();
-                    return username;
+                    try {
+                        var username = getUser(params[0].toString()).username();
+                        return username;
+                    } catch (Exception e ) {
+                        return null;
+                    }
+
                 } else {
                     return null;
                 }

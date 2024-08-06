@@ -37,8 +37,6 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
-
-
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
@@ -99,7 +97,7 @@ public class Server {
     }
 
     private Object joinGame(Request req, Response res) throws ResponseException {
-        String authToken = req.headers("Authorization").toString();
+        String authToken = req.headers("Authorization");
         var username = userService.authenticate(authToken);
 
         var joinRequest = gson.fromJson(req.body(), JoinRequest.class);
@@ -111,7 +109,7 @@ public class Server {
     }
 
     private Object listGames(Request req, Response res) throws ResponseException {
-        String authToken = req.headers("Authorization").toString();
+        String authToken = req.headers("Authorization");
         var username = userService.authenticate(authToken);
 
         res.type("application/json");
