@@ -20,7 +20,6 @@ public class MySQLGameDAO implements GameDAO {
         configureDatabase();
     }
 
-    @Override
     public GameData createGame(CreateRequest request) throws ResponseException {
         var game = new ChessGame();
         var statement = "INSERT INTO game (gameName, json) VALUES (?, ?, ?)";
@@ -29,7 +28,6 @@ public class MySQLGameDAO implements GameDAO {
         return new GameData(id, null, null, request.gameName(), game);
     }
 
-    @Override
     public GameData[] listGames() throws ResponseException {
         var games = new ArrayList<GameData>();
         try (var conn = DatabaseManager.getConnection()) {
@@ -49,7 +47,6 @@ public class MySQLGameDAO implements GameDAO {
         return gamesArray;
     }
 
-    @Override
     public GameData getGame(Integer gameID) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?";
@@ -67,18 +64,15 @@ public class MySQLGameDAO implements GameDAO {
         return null;
     }
 
-    @Override
     public GameData updateGame(Integer gameID, GameData newGame) throws ResponseException {
         return null;
     }
 
-    @Override
     public void deleteGame(Integer gameID) throws ResponseException {
         var statement = "DELETE FROM game WHERE gameID=?";
         executeUpdate(statement, gameID);
     }
 
-    @Override
     public void deleteAllGames() throws ResponseException {
         var statement = "TRUNCATE game";
         executeUpdate(statement);

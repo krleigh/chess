@@ -24,7 +24,14 @@ public class UserService {
             temp = new MemoryUserDAO();
         }
         this.userDAO = temp;
-        this.authDAO = new MemoryAuthDAO();
+        AuthDAO tempauth;
+        try {
+            tempauth = new MySQLAuthDAO();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            tempauth = new MemoryAuthDAO();
+        }
+        this.authDAO = tempauth;
     }
 
     public RegisterResult registerUser(RegisterRequest register) throws ResponseException{
