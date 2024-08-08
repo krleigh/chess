@@ -4,6 +4,7 @@ import dataaccess.*;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requestresult.*;
 import spark.Response;
 
@@ -14,6 +15,7 @@ public class UserService {
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
+    private org.mindrot.jbcrypt.BCrypt BCrypt;
 
     public UserService() {
         UserDAO temp;
@@ -50,7 +52,7 @@ public class UserService {
     public LoginResult login(LoginRequest login) throws ResponseException {
 
         var user = userDAO.getUser(login.username());
-        if(user == null || !Objects.equals(user.password(), login.password())) {
+        if(user == null || !Objects.equals(login.password(), user.password())) {//BCrypt.checkpw(login.password(), user.password())) {
             throw new ResponseException(401, "Error: unauthorized");
         }
         AuthData auth = authDAO.createAuth(login.username());

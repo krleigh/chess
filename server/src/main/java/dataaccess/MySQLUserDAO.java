@@ -3,6 +3,7 @@ package dataaccess;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requestresult.RegisterRequest;
 
 import java.sql.ResultSet;

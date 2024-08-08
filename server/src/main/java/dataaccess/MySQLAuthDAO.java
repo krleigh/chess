@@ -34,7 +34,7 @@ public class MySQLAuthDAO implements AuthDAO{
     public Collection<AuthData> listAuths() throws ResponseException {
         var result = new ArrayList<AuthData>();
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT username, password, email FROM user";
+            var statement = "SELECT authToken, username FROM auth";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {

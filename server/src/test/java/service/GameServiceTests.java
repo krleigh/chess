@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
@@ -69,13 +70,18 @@ public class GameServiceTests {
 
     @Test
     void listGamesTest() throws ResponseException{
-        ArrayList<GameData> expectedGames = new ArrayList<>();
-        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("cool game 01")).gameID()));
-        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("whale of a game")).gameID()));
-        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("hello whale")).gameID()));
-        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("my game")).gameID()));
+        ArrayList<Integer> expectedGames = new ArrayList<>();
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("cool game 01")).gameID()).gameID());
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("whale of a game")).gameID()).gameID());
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("hello whale")).gameID()).gameID());
+        expectedGames.add(GAME_SERVICE.getGame(GAME_SERVICE.createGame(new CreateRequest("my game")).gameID()).gameID());
 
-        assertArrayEquals(expectedGames.toArray(), GAME_SERVICE.listGames());
+        ArrayList<Integer> actualGames = new ArrayList<>();
+        for (var game : GAME_SERVICE.listGames()) {
+            actualGames.add(game.gameID());
+        }
+
+        assertArrayEquals(expectedGames.toArray(), actualGames.toArray());
 
     }
 
