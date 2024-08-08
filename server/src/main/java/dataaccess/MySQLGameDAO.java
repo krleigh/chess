@@ -22,7 +22,7 @@ public class MySQLGameDAO implements GameDAO {
 
     public GameData createGame(CreateRequest request) throws ResponseException {
         var game = new ChessGame();
-        var statement = "INSERT INTO game (gameName, json) VALUES (?, ?, ?)";
+        var statement = "INSERT INTO game (gameName, game) VALUES (?, ?)";
         var json = new Gson().toJson(game);
         var id = executeUpdate(statement, request.gameName(), json);
         return new GameData(id, null, null, request.gameName(), game);
