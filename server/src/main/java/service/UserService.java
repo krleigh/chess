@@ -43,8 +43,9 @@ public class UserService {
         }
         if (userDAO.getUser(register.username()) != null) {
             throw new ResponseException(403, "Error: already taken");}
-
-        UserData user = userDAO.createUser(register);
+        String hashedPassword = BCrypt.hashpw(register.password(), BCrypt.gensalt());
+        RegisterRequest hashedRegister = new RegisterRequest(register.username(), hashedPassword, register.email());
+        UserData user = userDAO.createUser(hashedRegister);
         AuthData auth = authDAO.createAuth(register.username());
         return new RegisterResult(user.username(), auth.authToken());
     }
@@ -52,7 +53,7 @@ public class UserService {
     public LoginResult login(LoginRequest login) throws ResponseException {
 
         var user = userDAO.getUser(login.username());
-        if(user == null || !Objects.equals(login.password(), user.password())) {//BCrypt.checkpw(login.password(), user.password())) {
+        if(user == null || !BCrypt.checkpw(login.password(), user.password())) {
             throw new ResponseException(401, "Error: unauthorized");
         }
         AuthData auth = authDAO.createAuth(login.username());

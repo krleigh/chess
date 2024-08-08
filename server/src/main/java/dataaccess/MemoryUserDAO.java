@@ -13,7 +13,6 @@ public class MemoryUserDAO implements UserDAO {
     final private HashMap<String,UserData> users = new HashMap<>();
 
     public UserData createUser(RegisterRequest register) throws ResponseException {
-        String hashedPassword = BCrypt.hashpw(register.password(), BCrypt.gensalt());
         UserData user = new UserData(register.username(), register.password(), register.email());
 
         users.put(user.username(), user);

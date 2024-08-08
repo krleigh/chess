@@ -8,6 +8,7 @@ import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requestresult.LoginRequest;
 import service.requestresult.RegisterRequest;
 import service.requestresult.RegisterResult;
@@ -32,9 +33,8 @@ public class UserServiceTests {
         var registerResult = SERVICE.registerUser(register);
         System.out.println(registerResult);
 
-        var users = SERVICE.listUsers();
-        assertEquals(1, users.size());
-        assertTrue(users.contains(new UserData(register.username(), register.password(), register.email())));
+        var users = SERVICE.getUser(register.username());
+        assertTrue(BCrypt.checkpw(register.password(), users.password()));
     }
 
     @Test
@@ -130,7 +130,8 @@ public class UserServiceTests {
     @Test
     void getUserTest() throws ResponseException, DataAccessException {
         var register = SERVICE.registerUser(new RegisterRequest("lugan", "whaleword", "whales@ewhal.com"));
-        assertEquals(new UserData("lugan", "whaleword", "whales@ewhal.com"), SERVICE.getUser(register.username()));
+        assertTrue(BCrypt.checkpw("whaleword", SERVICE.getUser(register.username()).password()));
+        assertEquals("whales@ewhal.com", SERVICE.getUser("lugan").email());
     }
 
     @Test
@@ -143,7 +144,7 @@ public class UserServiceTests {
     @Test
     void deleteUser() throws ResponseException, DataAccessException {
         var register = SERVICE.registerUser(new RegisterRequest("lugan", "whaleword", "whale@ewhale.com"));
-        assertEquals(new UserData("lugan", "whaleword", "whale@ewhale.com"), SERVICE.getUser(register.username()));
+        assertTrue(BCrypt.checkpw("whaleword", SERVICE.getUser(register.username()).password()));
         SERVICE.deleteUser("lugan");
         assertEquals(0, SERVICE.listUsers().size());
     }
