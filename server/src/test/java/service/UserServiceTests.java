@@ -31,7 +31,7 @@ public class UserServiceTests {
     void registerUserTest() throws ResponseException {
         var register = new RegisterRequest("lugan", "bbwhale", "whale@gwhale.com");
         var registerResult = SERVICE.registerUser(register);
-        System.out.println(registerResult);
+//        System.out.println(registerResult);
 
         var users = SERVICE.getUser(register.username());
         assertTrue(BCrypt.checkpw(register.password(), users.password()));

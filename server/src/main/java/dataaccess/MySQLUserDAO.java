@@ -23,6 +23,9 @@ public class MySQLUserDAO implements UserDAO {
 
 
     public UserData createUser(RegisterRequest register) throws ResponseException {
+        if (register.username() == null || register.password() == null || register.email() == null){
+            throw new ResponseException(400, "Error: bad request");
+        }
         try {
             var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
             var id = executeUpdate(statement, register.username(), register.password(), register.email());
@@ -64,7 +67,7 @@ public class MySQLUserDAO implements UserDAO {
         } catch (Exception e) {
             throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
         }
-        return null;
+        throw new ResponseException(500, "Error: User does not exist");
     }
 
     public void deleteUser(String username) throws ResponseException{
