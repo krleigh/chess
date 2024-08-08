@@ -28,11 +28,8 @@ public class MemoryUserDAO implements UserDAO {
 
     public UserData getUser(String username) throws ResponseException {
         var user = users.get(username);
-        if (user != null) {
-            return user;
-        } else{
-            throw new ResponseException(500, "Error: User does not exist");
-        }
+
+        return user;
     }
 
     public void deleteUser(String username) throws ResponseException {

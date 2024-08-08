@@ -37,6 +37,9 @@ public class UserService {
     }
 
     public RegisterResult registerUser(RegisterRequest register) throws ResponseException{
+        if (register.username() == null || register.password() == null || register.email() == null) {
+            throw new ResponseException(400, "Error: bad request");
+        }
 
         if (userDAO.getUser(register.username()) != null) {
             throw new ResponseException(403, "Error: already taken");}

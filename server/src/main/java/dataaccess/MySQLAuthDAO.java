@@ -21,6 +21,8 @@ public class MySQLAuthDAO implements AuthDAO{
 
 
     public AuthData createAuth(String username) throws ResponseException {
+        if (username == null) { throw new ResponseException(500, "Error: Null username");}
+
         try {
             String authToken = UUID.randomUUID().toString();
             var statement = "INSERT INTO auth (authToken, username) VALUES (?, ?)";

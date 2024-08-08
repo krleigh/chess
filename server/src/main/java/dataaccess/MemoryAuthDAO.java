@@ -13,6 +13,8 @@ public class MemoryAuthDAO implements AuthDAO {
     final private HashMap<String,AuthData> auths = new HashMap<>();
 
     public AuthData createAuth(String username) throws ResponseException  {
+        if (username == null) { throw new ResponseException(500, "Error: Null username");}
+
         String authToken = UUID.randomUUID().toString();
         AuthData auth = new AuthData(authToken, username);
 

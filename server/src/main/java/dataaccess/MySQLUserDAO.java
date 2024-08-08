@@ -60,6 +60,11 @@ public class MySQLUserDAO implements UserDAO {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
+                        var user = readUser(rs);
+
+                        if (user.username() == null) {
+                            throw new ResponseException(500, "Error: User Does not exist");
+                        }
                         return readUser(rs);
                     }
                 }
@@ -67,7 +72,7 @@ public class MySQLUserDAO implements UserDAO {
         } catch (Exception e) {
             throw new ResponseException(500, String.format("Unable to read data: %s", e.getMessage()));
         }
-        throw new ResponseException(500, "Error: User does not exist");
+        return null;
     }
 
     public void deleteUser(String username) throws ResponseException{
