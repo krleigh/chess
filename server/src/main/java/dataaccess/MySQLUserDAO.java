@@ -60,11 +60,6 @@ public class MySQLUserDAO implements UserDAO {
                 ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        var user = readUser(rs);
-
-                        if (user.username() == null) {
-                            throw new ResponseException(500, "Error: User Does not exist");
-                        }
                         return readUser(rs);
                     }
                 }
@@ -98,8 +93,8 @@ public class MySQLUserDAO implements UserDAO {
             try (var ps = conn.prepareStatement(statement)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
+                    if (param instanceof String p) {ps.setString(i + 1, p);}
+                    else if (param == null) {ps.setNull(i + 1, NULL);}
                 }
                 ps.executeUpdate();
 

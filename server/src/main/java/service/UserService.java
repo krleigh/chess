@@ -15,7 +15,7 @@ public class UserService {
 
     private final UserDAO userDAO;
     private final AuthDAO authDAO;
-    private org.mindrot.jbcrypt.BCrypt BCrypt;
+
 
     public UserService() {
         UserDAO temp;
