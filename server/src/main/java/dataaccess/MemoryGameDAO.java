@@ -33,6 +33,7 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public GameData updateGame(Integer gameID, GameData newGame) throws ResponseException {
+        if (newGame == null) { throw new ResponseException(500, "Error: null new game data");}
         games.put(gameID, newGame);
         return newGame;
     }

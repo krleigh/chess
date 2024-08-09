@@ -46,7 +46,7 @@ public class AuthDAOTests {
 
     @ParameterizedTest
     @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
-    void listAuths(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
+    void listAuthsTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
         AuthDAO authDAO = getDataAccess(dbClass);
 
         ArrayList<AuthData> expectedAuths = new ArrayList<>();
@@ -56,6 +56,68 @@ public class AuthDAOTests {
         assert(authDAO.listAuths().containsAll(expectedAuths));
 
     }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
+    void listNoAuthsTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
+        AuthDAO authDAO = getDataAccess(dbClass);
+
+        assertEquals(0, authDAO.listAuths().size());
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
+    void getAuthTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
+        AuthDAO authDAO = getDataAccess(dbClass);
+
+        var auth = authDAO.createAuth("lugan").authToken();
+
+        assertEquals(auth, authDAO.getAuth(auth).authToken());
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
+    void getAuthNegativeTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
+        AuthDAO authDAO = getDataAccess(dbClass);
+
+        assertEquals(null, authDAO.getAuth("293057047023203"));
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
+    void deleteAuthTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
+        AuthDAO authDAO = getDataAccess(dbClass);
+
+        var auth = authDAO.createAuth("lugan").authToken();
+
+        assertEquals(auth, authDAO.getAuth(auth).authToken());
+
+        authDAO.deleteAuth(auth);
+
+        assertEquals(null, authDAO.getAuth(auth));
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySQLAuthDAO.class, MemoryAuthDAO.class})
+    void deleteAllAuthsTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
+        AuthDAO authDAO = getDataAccess(dbClass);
+
+        var auth = authDAO.createAuth("lugan").authToken();
+
+        assertEquals(auth, authDAO.getAuth(auth).authToken());
+
+        authDAO.deleteAllAuths();
+
+        assertEquals(0, authDAO.listAuths().size());
+
+    }
+
+
 
 
 
