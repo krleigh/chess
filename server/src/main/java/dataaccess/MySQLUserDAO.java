@@ -18,7 +18,7 @@ import static java.sql.Types.NULL;
 public class MySQLUserDAO implements UserDAO {
 
     public MySQLUserDAO() throws ResponseException {
-        configureDatabase();
+        DatabaseManager.configureDatabase(createStatements);
     }
 
 
@@ -125,17 +125,5 @@ public class MySQLUserDAO implements UserDAO {
     };
 
 
-    private void configureDatabase() throws ResponseException {
-        try { DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException | DataAccessException ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
+
 }

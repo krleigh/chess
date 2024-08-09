@@ -16,7 +16,7 @@ import static java.sql.Types.NULL;
 public class MySQLAuthDAO implements AuthDAO{
 
     public MySQLAuthDAO() throws ResponseException {
-        configureDatabase();
+        DatabaseManager.configureDatabase(createStatements);
     }
 
 

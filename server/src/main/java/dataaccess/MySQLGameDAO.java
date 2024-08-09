@@ -17,7 +17,7 @@ import static java.sql.Types.NULL;
 public class MySQLGameDAO implements GameDAO {
 
     public MySQLGameDAO() throws ResponseException {
-        configureDatabase();
+        DatabaseManager.configureDatabase(createStatements);
     }
 
     public GameData createGame(CreateRequest request) throws ResponseException {
@@ -130,17 +130,4 @@ public class MySQLGameDAO implements GameDAO {
             """
     };
 
-    private void configureDatabase() throws ResponseException {
-        try { DatabaseManager.createDatabase();
-            try (var conn = DatabaseManager.getConnection()) {
-                for (var statement : createStatements) {
-                    try (var preparedStatement = conn.prepareStatement(statement)) {
-                        preparedStatement.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException | DataAccessException ex) {
-            throw new ResponseException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-    }
 }
