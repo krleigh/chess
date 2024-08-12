@@ -1,11 +1,8 @@
 package dataaccess;
 
-import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
-import service.requestresult.CreateRequest;
-
-import java.util.Collection;
+import Server.requestresult.CreateRequest;
 
 public interface GameDAO {
 

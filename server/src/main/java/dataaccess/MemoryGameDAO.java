@@ -3,11 +3,8 @@ package dataaccess;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
-import model.UserData;
-import service.requestresult.CreateRequest;
-import service.requestresult.JoinRequest;
+import Server.requestresult.CreateRequest;
 
-import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO{

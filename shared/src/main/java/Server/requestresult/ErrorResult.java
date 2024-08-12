@@ -1,4 +1,4 @@
-package service.requestresult;
+package Server.requestresult;
 
 public class ErrorResult {
     private int statusCode;

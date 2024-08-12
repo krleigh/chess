@@ -3,16 +3,12 @@ package dataaccess;
 import exception.ResponseException;
 import model.UserData;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mindrot.jbcrypt.BCrypt;
-import service.requestresult.RegisterRequest;
+import Server.requestresult.RegisterRequest;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

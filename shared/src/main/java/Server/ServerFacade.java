@@ -1,8 +1,11 @@
-package server;
+package Server;
 
+import Server.requestresult.LoginRequest;
+import Server.requestresult.RegisterRequest;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.User;
+import model.AuthData;
+import model.UserData;
 
 import java.io.*;
 import java.net.*;
@@ -16,9 +19,19 @@ public class ServerFacade {
     }
 
 
-    public UserData registerUser(RegisterRequest register ) throws ResponseException {
-        var path = "/pet";
-        return this.makeRequest("POST", path, pet, Pet.class);
+    public UserData registerUser(RegisterRequest register) throws ResponseException {
+        var path = "/user";
+        return this.makeRequest("POST", path, register, UserData.class);
+    }
+
+    public AuthData login(LoginRequest login) throws ResponseException {
+        var path = "/session";
+        return this.makeRequest("POST", path, login, AuthData.class);
+    }
+
+    public void logout(String auth) throws ResponseException{
+        var path = "/session";
+        this.makeRequest("DELETE", path, auth, null);
     }
 
     public void deletePet(int id) throws ResponseException {

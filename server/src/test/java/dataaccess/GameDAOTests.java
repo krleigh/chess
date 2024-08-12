@@ -3,17 +3,12 @@ package dataaccess;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
-import model.UserData;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import service.requestresult.CreateRequest;
-import service.requestresult.RegisterRequest;
+import Server.requestresult.CreateRequest;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

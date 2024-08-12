@@ -2,8 +2,7 @@ package dataaccess;
 
 import exception.ResponseException;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
-import service.requestresult.RegisterRequest;
+import Server.requestresult.RegisterRequest;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -4,7 +4,6 @@ import exception.ResponseException;
 import model.AuthData;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import service.requestresult.RegisterRequest;
 
 import java.util.ArrayList;
 

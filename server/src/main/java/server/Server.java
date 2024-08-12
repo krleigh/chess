@@ -1,5 +1,6 @@
 package server;
 
+import Server.requestresult.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import exception.ResponseException;

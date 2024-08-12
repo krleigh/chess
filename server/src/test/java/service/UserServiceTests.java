@@ -1,17 +1,15 @@
 package service;
 
 import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import service.requestresult.LoginRequest;
-import service.requestresult.RegisterRequest;
-import service.requestresult.RegisterResult;
+import Server.requestresult.LoginRequest;
+import Server.requestresult.RegisterRequest;
+import Server.requestresult.RegisterResult;
 
 import java.util.ArrayList;
 import java.util.Collection;

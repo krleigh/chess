@@ -4,12 +4,10 @@ import chess.ChessGame;
 import dataaccess.*;
 import exception.ResponseException;
 import model.GameData;
-import service.requestresult.CreateRequest;
-import service.requestresult.CreateResult;
-import service.requestresult.GameListResult;
-import service.requestresult.JoinRequest;
+import Server.requestresult.CreateRequest;
+import Server.requestresult.CreateResult;
+import Server.requestresult.JoinRequest;
 
-import java.util.Collection;
 import java.util.Objects;
 
 public class GameService {
