@@ -1,12 +1,8 @@
-package Server;
+package serverfacade;
 
-import Server.requestresult.LoginRequest;
-import Server.requestresult.RegisterRequest;
+import serverfacade.requestresult.*;
 import com.google.gson.Gson;
 import exception.ResponseException;
-import model.AuthData;
-import model.UserData;
-
 import java.io.*;
 import java.net.*;
 
@@ -19,14 +15,14 @@ public class ServerFacade {
     }
 
 
-    public UserData registerUser(RegisterRequest register) throws ResponseException {
+    public RegisterResult registerUser(RegisterRequest register) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, register, UserData.class);
+        return this.makeRequest("POST", path, register, RegisterResult.class);
     }
 
-    public AuthData login(LoginRequest login) throws ResponseException {
+    public LoginResult login(LoginRequest login) throws ResponseException {
         var path = "/session";
-        return this.makeRequest("POST", path, login, AuthData.class);
+        return this.makeRequest("POST", path, login, LoginResult.class);
     }
 
     public void logout(String auth) throws ResponseException{
@@ -34,22 +30,23 @@ public class ServerFacade {
         this.makeRequest("DELETE", path, auth, null);
     }
 
-    public void deletePet(int id) throws ResponseException {
-        var path = String.format("/pet/%s", id);
-        this.makeRequest("DELETE", path, null, null);
+    public GameListResult listGames(String auth) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("GET", path, auth, GameListResult.class);
     }
 
-    public void deleteAllPets() throws ResponseException {
-        var path = "/pet";
-        this.makeRequest("DELETE", path, null, null);
+    public CreateResult createGame(CreateRequest create) throws ResponseException {
+        var path = "/game";
+        return this.makeRequest("POST", path, create, CreateResult.class);
     }
 
-    public Pet[] listPets() throws ResponseException {
-        var path = "/pet";
-        record listPetResponse(Pet[] pet) {
-        }
-        var response = this.makeRequest("GET", path, null, listPetResponse.class);
-        return response.pet();
+    public void joinGame(JoinRequest join) throws ResponseException {
+        var path = "game";
+        this.makeRequest("PUT", path, join, null);
+    }
+
+    public void clear() throws ResponseException{
+
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {

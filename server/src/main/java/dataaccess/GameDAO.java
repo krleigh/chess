@@ -2,7 +2,7 @@ package dataaccess;
 
 import exception.ResponseException;
 import model.GameData;
-import Server.requestresult.CreateRequest;
+import serverfacade.requestresult.CreateRequest;
 
 public interface GameDAO {
 

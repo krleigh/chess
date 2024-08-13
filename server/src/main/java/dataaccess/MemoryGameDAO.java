@@ -3,7 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import exception.ResponseException;
 import model.GameData;
-import Server.requestresult.CreateRequest;
+import serverfacade.requestresult.CreateRequest;
 
 import java.util.HashMap;
 

@@ -5,7 +5,7 @@ import model.UserData;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import Server.requestresult.RegisterRequest;
+import serverfacade.requestresult.RegisterRequest;
 
 import java.util.ArrayList;
 import java.util.Collection;

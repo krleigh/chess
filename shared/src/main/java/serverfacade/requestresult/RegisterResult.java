@@ -1,4 +1,4 @@
-package Server.requestresult;
+package serverfacade.requestresult;
 
 public record RegisterResult (String username, String authToken){
 }

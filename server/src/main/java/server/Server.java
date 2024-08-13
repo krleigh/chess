@@ -1,12 +1,11 @@
 package server;
 
-import Server.requestresult.*;
+import serverfacade.requestresult.*;
 import com.google.gson.Gson;
 import dataaccess.*;
 import exception.ResponseException;
 import service.ClearService;
 import service.GameService;
-import service.requestresult.*;
 import service.UserService;
 import spark.*;
 
@@ -41,7 +40,7 @@ public class Server {
         //This line initializes the server and can be removed once you have a functioning endpoint 
 //        Spark.init();
 
-        Spark.awaitInitialization();
+//        Spark.awaitInitialization();
         System.out.println("Listening on port " + desiredPort);
         return Spark.port();
     }

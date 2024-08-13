@@ -1,15 +1,14 @@
 package service;
 
-import Server.requestresult.LoginRequest;
-import Server.requestresult.LoginResult;
-import Server.requestresult.RegisterRequest;
-import Server.requestresult.RegisterResult;
+import serverfacade.requestresult.LoginRequest;
+import serverfacade.requestresult.LoginResult;
+import serverfacade.requestresult.RegisterRequest;
+import serverfacade.requestresult.RegisterResult;
 import dataaccess.*;
 import exception.ResponseException;
 import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
-import service.requestresult.*;
 
 import java.util.Collection;
 

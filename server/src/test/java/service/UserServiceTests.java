@@ -7,9 +7,9 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
-import Server.requestresult.LoginRequest;
-import Server.requestresult.RegisterRequest;
-import Server.requestresult.RegisterResult;
+import serverfacade.requestresult.LoginRequest;
+import serverfacade.requestresult.RegisterRequest;
+import serverfacade.requestresult.RegisterResult;
 
 import java.util.ArrayList;
 import java.util.Collection;

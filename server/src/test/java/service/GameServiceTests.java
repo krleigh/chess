@@ -6,9 +6,9 @@ import exception.ResponseException;
 import model.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import Server.requestresult.CreateRequest;
-import Server.requestresult.JoinRequest;
-import Server.requestresult.RegisterRequest;
+import serverfacade.requestresult.CreateRequest;
+import serverfacade.requestresult.JoinRequest;
+import serverfacade.requestresult.RegisterRequest;
 
 import java.util.ArrayList;
 

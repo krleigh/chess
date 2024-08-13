@@ -4,9 +4,9 @@ import chess.ChessGame;
 import dataaccess.*;
 import exception.ResponseException;
 import model.GameData;
-import Server.requestresult.CreateRequest;
-import Server.requestresult.CreateResult;
-import Server.requestresult.JoinRequest;
+import serverfacade.requestresult.CreateRequest;
+import serverfacade.requestresult.CreateResult;
+import serverfacade.requestresult.JoinRequest;
 
 import java.util.Objects;
 
