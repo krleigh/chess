@@ -38,11 +38,12 @@ public class Server {
         Spark.exception(ResponseException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint 
-//        Spark.init();
+        Spark.init();
 
-//        Spark.awaitInitialization();
-        System.out.println("Listening on port " + desiredPort);
-        return Spark.port();
+        Spark.awaitInitialization();
+        var port = Spark.port();
+        System.out.println("Listening on port " + port);
+        return port;
     }
 
     public int port() {
