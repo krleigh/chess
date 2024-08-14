@@ -81,7 +81,7 @@ public class Server {
     }
 
     private Object logout(Request req, Response res) throws ResponseException {
-        String authToken = req.headers("Authorization").toString();
+        String authToken = req.headers("Authorization");
         userService.logout(authToken);
         res.body("{}");
         return res.body();

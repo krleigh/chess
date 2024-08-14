@@ -1,13 +1,16 @@
 package client;
 
+import chess.ChessGame;
 import exception.ResponseException;
-import serverfacade.requestresult.RegisterRequest;
-import serverfacade.requestresult.RegisterResult;
+import serverfacade.requestresult.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import serverfacade.ServerFacade;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Arrays;
+import java.util.Objects;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
 
@@ -37,7 +40,52 @@ public class ServerFacadeTests {
     @Test
     public void registerUserTest() throws ResponseException {
         var authData = serverFacade.registerUser(new RegisterRequest("lugan", "secretpassword", "fish@ewhale.com"));
-        assertTrue(authData.authToken().length() > 10);
+        assertEquals(authData.username(), "lugan");
+    }
+
+    @Test
+    public void loginTest() throws ResponseException {
+        var authData = serverFacade.registerUser(new RegisterRequest("lugan", "secretpassword", "fish@ewhale.com"));
+        serverFacade.logout(authData.authToken());
+        var newAuth = serverFacade.login(new LoginRequest("lugan", "secretpassword"));
+        assertDoesNotThrow(() -> {
+            serverFacade.listGames(newAuth.authToken());
+        });
+
+    }
+
+    @Test
+    public void logoutTest() throws ResponseException {
+        var authData = serverFacade.registerUser(new RegisterRequest("lugan", "secretpassword", "fish@ewhale.com"));
+        serverFacade.logout(authData.authToken());
+        assertThrows(ResponseException.class, () -> {
+            serverFacade.listGames(authData.authToken());
+        });
+    }
+
+    @Test
+    public void listGamesTest() throws ResponseException {
+        var authData = serverFacade.registerUser(new RegisterRequest("perivanwinkle", "eight88", "octo@ewhale.com"));
+        var gameID = serverFacade.createGame(new CreateRequest("cool octopi game"), authData.authToken()).gameID();
+        var games = serverFacade.listGames(authData.authToken());
+        assert(games.getGames()[0].gameID() == gameID);
+    }
+
+    @Test
+    public void createGame() throws ResponseException {
+        var authData = serverFacade.registerUser(new RegisterRequest("ella", "phantphant", "peanut@ewhale.com"));
+        var gameID = serverFacade.createGame(new CreateRequest("cool elephant game"), authData.authToken()).gameID();
+        var games = serverFacade.listGames(authData.authToken());
+        assert(games.getGames()[0].gameID() == gameID && Objects.equals(games.getGames()[0].gameName(), "cool elephant game"));
+    }
+
+    @Test
+    public void joinGame() throws ResponseException {
+        var authData = serverFacade.registerUser(new RegisterRequest("ella", "phantphant", "peanut@ewhale.com"));
+        var gameID = serverFacade.createGame(new CreateRequest("cool elephant game"), authData.authToken()).gameID();
+        serverFacade.joinGame(new JoinRequest(gameID, ChessGame.TeamColor.BLACK), authData.authToken());
+        var games = serverFacade.listGames(authData.authToken());
+        assertEquals("ella", games.getGames()[0].blackUsername());
     }
 
 }
