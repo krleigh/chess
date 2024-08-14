@@ -18,9 +18,14 @@ public class ServerFacadeTests {
     public static void init() {
         server = new Server();
         var port = server.run(0);
-//        System.out.println(port);
+
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade("http://localhost:" + port);
+    }
+
+    @BeforeEach
+    public void clear() throws ResponseException {
+        serverFacade.clear();
     }
 
     @AfterAll

@@ -41,17 +41,18 @@ public class ServerFacade {
     }
 
     public void joinGame(JoinRequest join) throws ResponseException {
-        var path = "game";
+        var path = "/game";
         this.makeRequest("PUT", path, join, null);
     }
 
     public void clear() throws ResponseException{
-
+        var path = "/db";
+        this.makeRequest("DELETE", path, null, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
         try {
-//            System.out.print(serverUrl);
+
             URL url = (new URI(serverUrl + path)).toURL();
 
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
