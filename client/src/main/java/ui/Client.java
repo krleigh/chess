@@ -11,7 +11,7 @@ public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     private final Repl repl;
-    private State state = State.LOGGED_IN;
+    private State state = State.LOGGED_OUT;
 
 
     public Client (String serverUrl, Repl repl) {
@@ -30,8 +30,8 @@ public class Client {
                 case "login" -> login(params);
                 case "create" -> create();
                 case "list" -> list();
-                case "join" -> join(params);
-                case "observe" -> observe(params);
+                case "join" -> join();
+                case "observe" -> observe();
                 case "logout" -> logout();
                 case "quit" -> "quit";
                 default -> help();
@@ -42,81 +42,88 @@ public class Client {
     }
 
     public String register(String... params) throws ResponseException {
-        if (params.length >= 1) {
-            state = State.SIGNEDIN;
-            visitorName = String.join("-", params);
-            ws = new WebSocketFacade(serverUrl, notificationHandler);
-            ws.enterPetShop(visitorName);
-            return String.format("You signed in as %s.", visitorName);
-        }
-        throw new ResponseException(400, "Expected: <yourname>");
+//        if (params.length >= 1) {
+//            state = State.SIGNEDIN;
+//            visitorName = String.join("-", params);
+//            ws = new WebSocketFacade(serverUrl, notificationHandler);
+//            ws.enterPetShop(visitorName);
+//            return String.format("You signed in as %s.", visitorName);
+//        }
+//        throw new ResponseException(400, "Expected: <yourname>");
+        return "\n register";
     }
 
     public String login(String... params) throws ResponseException {
-        assertSignedIn();
-        if (params.length >= 2) {
-            var name = params[0];
-            var type = PetType.valueOf(params[1].toUpperCase());
-            var pet = new Pet(0, name, type);
-            pet = server.addPet(pet);
-            return String.format("You rescued %s. Assigned ID: %d", pet.name(), pet.id());
-        }
-        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
+//        assertSignedIn();
+//        if (params.length >= 2) {
+//            var name = params[0];
+//            var type = PetType.valueOf(params[1].toUpperCase());
+//            var pet = new Pet(0, name, type);
+//            pet = server.addPet(pet);
+//            return String.format("You rescued %s. Assigned ID: %d", pet.name(), pet.id());
+//        }
+//        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
+        return "\n login";
     }
 
     public String list() throws ResponseException {
-        assertSignedIn();
-        var pets = server.listPets();
-        var result = new StringBuilder();
-        var gson = new Gson();
-        for (var pet : pets) {
-            result.append(gson.toJson(pet)).append('\n');
-        }
-        return result.toString();
+//        assertSignedIn();
+//        var pets = server.listPets();
+//        var result = new StringBuilder();
+//        var gson = new Gson();
+//        for (var pet : pets) {
+//            result.append(gson.toJson(pet)).append('\n');
+//        }
+//        return result.toString();\
+        return "\n list";
     }
 
     public String create(String... params) throws ResponseException {
-        assertSignedIn();
-        if (params.length == 1) {
-            try {
-                var id = Integer.parseInt(params[0]);
-                var pet = getPet(id);
-                if (pet != null) {
-                    server.deletePet(id);
-                    return String.format("%s says %s", pet.name(), pet.sound());
-                }
-            } catch (NumberFormatException ignored) {
-            }
-        }
-        throw new ResponseException(400, "Expected: <pet id>");
+//        assertSignedIn();
+//        if (params.length == 1) {
+//            try {
+//                var id = Integer.parseInt(params[0]);
+//                var pet = getPet(id);
+//                if (pet != null) {
+//                    server.deletePet(id);
+//                    return String.format("%s says %s", pet.name(), pet.sound());
+//                }
+//            } catch (NumberFormatException ignored) {
+//            }
+//        }
+//        throw new ResponseException(400, "Expected: <pet id>");
+        return "\n create";
     }
 
     public String join() throws ResponseException {
-        assertSignedIn();
-        var buffer = new StringBuilder();
-        for (var pet : server.listPets()) {
-            buffer.append(String.format("%s says %s%n", pet.name(), pet.sound()));
-        }
-
-        server.deleteAllPets();
-        return buffer.toString();
+//        assertSignedIn();
+//        var buffer = new StringBuilder();
+//        for (var pet : server.listPets()) {
+//            buffer.append(String.format("%s says %s%n", pet.name(), pet.sound()));
+//        }
+//
+//        server.deleteAllPets();
+//        return buffer.toString();
+        return "\n join";
     }
 
     public String logout() throws ResponseException {
-        assertSignedIn();
-        ws.leavePetShop(visitorName);
-        ws = null;
-        state = State.SIGNEDOUT;
-        return String.format("%s left the shop", visitorName);
+//        assertSignedIn();
+//        ws.leavePetShop(visitorName);
+//        ws = null;
+//        state = State.SIGNEDOUT;
+//        return String.format("%s left the shop", visitorName);
+        return "\n logout";
     }
 
-    private Pet quit(int id) throws ResponseException {
-        for (var pet : server.listPets()) {
-            if (pet.id() == id) {
-                return pet;
-            }
-        }
-        return null;
+    private String observe() throws ResponseException {
+//        for (var pet : server.listPets()) {
+//            if (pet.id() == id) {
+//                return pet;
+//            }
+//        }
+//        return null;
+        return "\n observe";
     }
 
     public String help() {
