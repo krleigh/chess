@@ -10,14 +10,14 @@ public class Client {
     private String authToken;
     private final ServerFacade server;
     private final String serverUrl;
-    private final NotificationHandler notificationHandler;
+    private final Repl repl;
     private State state = State.LOGGED_IN;
 
 
-    public Client (String serverUrl, NotificationHandler notificationHandler) {
+    public Client (String serverUrl, Repl repl) {
         this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
+        this.repl = repl;
     }
 
     public String eval(String input) {

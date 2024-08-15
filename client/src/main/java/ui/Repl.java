@@ -1,13 +1,21 @@
 package ui;
 
-import com.sun.nio.sctp.HandlerResult;
-import com.sun.nio.sctp.Notification;
-import com.sun.nio.sctp.NotificationHandler;
-
-public class Repl implements NotificationHandler {
 
 
-    public HandlerResult handleNotification(Notification notification, Object attachment) {
-        return null;
+public class Repl  {
+
+    private final Client client;
+
+    public Repl(String serverUrl) {
+        client = new Client(serverUrl, this);
+    }
+
+    public void run() {
+
+    }
+
+
+    public void notify() {
+
     }
 }
