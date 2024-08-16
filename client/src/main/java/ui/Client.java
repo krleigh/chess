@@ -3,6 +3,7 @@ package ui;
 import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
 import serverfacade.ServerFacade;
+import serverfacade.requestresult.RegisterRequest;
 
 import java.util.Arrays;
 
@@ -42,15 +43,13 @@ public class Client {
     }
 
     public String register(String... params) throws ResponseException {
-//        if (params.length >= 1) {
-//            state = State.SIGNEDIN;
-//            visitorName = String.join("-", params);
-//            ws = new WebSocketFacade(serverUrl, notificationHandler);
-//            ws.enterPetShop(visitorName);
-//            return String.format("You signed in as %s.", visitorName);
-//        }
-//        throw new ResponseException(400, "Expected: <yourname>");
-        return "\n register";
+        if (params.length == 3) {
+            state = State.LOGGED_IN;
+            server.registerUser(new RegisterRequest(params[0], params[1], params[2]));
+            return String.format("You signed in as %s.", params[0]);
+        }
+        throw new ResponseException(400, "Expected: <username>, <password>, <email>");
+//        return "\n register";
     }
 
     public String login(String... params) throws ResponseException {
