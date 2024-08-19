@@ -85,7 +85,7 @@ public class UserDAOTests {
     @ValueSource(classes = {MySQLUserDAO.class, MemoryUserDAO.class})
     void getUserDoesNotExistTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
         UserDAO userDAO = getDataAccess(dbClass);
-        assertEquals(null, userDAO.getUser("lugan"));
+        assertNull(userDAO.getUser("lugan"));
     }
 
     @ParameterizedTest
@@ -96,7 +96,7 @@ public class UserDAOTests {
         var register = userDAO.createUser(new RegisterRequest("lugan", "whaleword", "whale@ewhale.com"));
         assertNotEquals(0, userDAO.listUsers().size());
         userDAO.deleteUser("lugan");
-        assertEquals(null, userDAO.getUser("lugan"));
+        assertNull(userDAO.getUser("lugan"));
     }
 
     @ParameterizedTest

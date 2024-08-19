@@ -64,11 +64,7 @@ public abstract class MoveCalculator {
             ChessPiece place = mBoard.getPiece(movpos);
             if (place != null) {place.getTeamColor();}
             ChessGame.TeamColor myColor = mColor;
-            if (mBoard.getPiece(movpos) != null && mColor == mBoard.getPiece(movpos).getTeamColor()){
-                return false;
-            } else {
-                return true;
-            }
+            return mBoard.getPiece(movpos) == null || mColor != mBoard.getPiece(movpos).getTeamColor();
         }
 
     }

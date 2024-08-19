@@ -4,7 +4,7 @@ package serverfacade.requestresult;
 import model.GameData;
 
 public class GameListResult  {
-    private GameData[] games;
+    private final GameData[] games;
 
     public GameListResult(GameData[] games) {
         this.games = games;

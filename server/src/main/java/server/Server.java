@@ -88,7 +88,7 @@ public class Server {
     }
 
     private Object createGame(Request req, Response res) throws ResponseException {
-        String authToken = req.headers("Authorization").toString();
+        String authToken = req.headers("Authorization");
         var username = userService.authenticate(authToken);
 
         var createRequest = gson.fromJson(req.body(), CreateRequest.class);

@@ -1,8 +1,8 @@
 package serverfacade.requestresult;
 
 public class ErrorResult {
-    private int statusCode;
-    private String message;
+    private final int statusCode;
+    private final String message;
 
     public ErrorResult(int statusCode, String message) {
         this.statusCode = statusCode;

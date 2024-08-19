@@ -34,6 +34,7 @@ public class Client {
                 case "join" -> join();
                 case "observe" -> observe();
                 case "logout" -> logout();
+                case "clear" -> clear();
                 case "quit" -> "quit";
                 default -> help();
             };
@@ -123,6 +124,11 @@ public class Client {
 //        }
 //        return null;
         return "\n observe";
+    }
+
+    private String clear() throws ResponseException {
+        server.clear();
+        return "Database cleared";
     }
 
     public String help() {

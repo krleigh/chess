@@ -85,7 +85,7 @@ public class GameDAOTests {
     @ValueSource(classes = {MySQLGameDAO.class, MemoryGameDAO.class})
     void getGameNullTest(Class<? extends GameDAO> dbClass) throws ResponseException, DataAccessException {
         GameDAO gameDAO = getDataAccess(dbClass);
-        assertEquals(null, gameDAO.getGame(34));
+        assertNull(gameDAO.getGame(34));
     }
 
     @ParameterizedTest

@@ -81,7 +81,7 @@ public class AuthDAOTests {
     void getAuthNegativeTest(Class<? extends UserDAO> dbClass) throws ResponseException, DataAccessException {
         AuthDAO authDAO = getDataAccess(dbClass);
 
-        assertEquals(null, authDAO.getAuth("293057047023203"));
+        assertNull(authDAO.getAuth("293057047023203"));
 
     }
 
@@ -96,7 +96,7 @@ public class AuthDAOTests {
 
         authDAO.deleteAuth(auth);
 
-        assertEquals(null, authDAO.getAuth(auth));
+        assertNull(authDAO.getAuth(auth));
 
     }
 
