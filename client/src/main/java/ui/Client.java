@@ -3,7 +3,10 @@ package ui;
 import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
 import serverfacade.ServerFacade;
+import serverfacade.requestresult.LoginRequest;
+import serverfacade.requestresult.LoginResult;
 import serverfacade.requestresult.RegisterRequest;
+import serverfacade.requestresult.RegisterResult;
 
 import java.util.Arrays;
 
@@ -46,24 +49,23 @@ public class Client {
     public String register(String... params) throws ResponseException {
         if (params.length == 3) {
             state = State.LOGGED_IN;
-            server.registerUser(new RegisterRequest(params[0], params[1], params[2]));
-            return String.format("You signed in as %s.", params[0]);
+            RegisterResult result = server.registerUser(new RegisterRequest(params[0], params[1], params[2]));
+            authToken = result.authToken();
+            return String.format("You registered as %s.", params[0]);
         }
         throw new ResponseException(400, "Expected: <username>, <password>, <email>");
 //        return "\n register";
     }
 
     public String login(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length >= 2) {
-//            var name = params[0];
-//            var type = PetType.valueOf(params[1].toUpperCase());
-//            var pet = new Pet(0, name, type);
-//            pet = server.addPet(pet);
-//            return String.format("You rescued %s. Assigned ID: %d", pet.name(), pet.id());
-//        }
-//        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
-        return "\n login";
+        assertLoggedIn();
+        if (params.length >= 2) {
+            LoginResult result = server.login(new LoginRequest(params[0], params[1]));
+            authToken = result.authToken();
+            return String.format("You logged in as %s.", params[0]);
+        }
+        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
+//        return "\n login";
     }
 
     public String list() throws ResponseException {
@@ -156,9 +158,9 @@ public class Client {
                     """;
     }
 
-    private void assertSignedIn() throws ResponseException {
+    private void assertLoggedIn() throws ResponseException {
         if (state == State.LOGGED_OUT) {
-            throw new ResponseException(400, "Log in");
+            throw new ResponseException(400, "Error: Please log in");
         }
     }
 
