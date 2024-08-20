@@ -8,8 +8,8 @@ import static ui.EscapeSequences.*;
 
 public class DrawBoard {
 
-    private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int SQUARE_SIZE_IN_PADDED_CHARS = 3;
+    private static final int BOARD_SIZE_IN_SQUARES = 10;
+    private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
     private static final int LINE_WIDTH_IN_PADDED_CHARS = 1;
 
     private static int GAMEID;
@@ -29,17 +29,23 @@ public class DrawBoard {
 
         drawTicTacToeBoard(out);
 
+        drawHeaders(out);
+
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
     private static void drawHeaders(PrintStream out) {
 
-        setBlack(out);
+        setGrey(out);
 
-        String[] headers = { "TIC", "TAC", "TOE" };
+        String[] headers = { " ", "a", "b", "c", "d", "e", "f", "g", "h", " " };
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
+            if (boardCol == BOARD_SIZE_IN_SQUARES - 1) {
+                setBlack(out);
+            }
+
 
             if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
                 out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
@@ -59,12 +65,12 @@ public class DrawBoard {
     }
 
     private static void printHeaderText(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_GREEN);
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(SET_TEXT_COLOR_BLACK);
 
         out.print(player);
 
-        setBlack(out);
+        setGrey(out);
     }
 
     private static void drawTicTacToeBoard(PrintStream out) {
@@ -139,6 +145,11 @@ public class DrawBoard {
     private static void setBlack(PrintStream out) {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_BLACK);
+    }
+
+    private static void setGrey(PrintStream out) {
+        out.print (SET_BG_COLOR_LIGHT_GREY);
+        out.print(SET_TEXT_COLOR_LIGHT_GREY);
     }
 
     private static void printPlayer(PrintStream out, String player) {
