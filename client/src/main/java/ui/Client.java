@@ -1,17 +1,17 @@
 package ui;
 
+import chess.ChessGame;
 import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
 import serverfacade.ServerFacade;
-import serverfacade.requestresult.LoginRequest;
-import serverfacade.requestresult.LoginResult;
-import serverfacade.requestresult.RegisterRequest;
-import serverfacade.requestresult.RegisterResult;
+import serverfacade.requestresult.*;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Client {
     private String authToken;
+    private String username;
     private final ServerFacade server;
     private final String serverUrl;
     private final Repl repl;
@@ -34,8 +34,8 @@ public class Client {
                 case "login" -> login(params);
                 case "create" -> create();
                 case "list" -> list();
-                case "join" -> join();
-                case "observe" -> observe();
+                case "join" -> join(params);
+                case "observe" -> observe(params);
                 case "logout" -> logout();
                 case "clear" -> clear();
                 case "quit" -> "quit";
@@ -51,6 +51,7 @@ public class Client {
             state = State.LOGGED_IN;
             RegisterResult result = server.registerUser(new RegisterRequest(params[0], params[1], params[2]));
             authToken = result.authToken();
+            username = result.username();
             return String.format("You registered as %s.", params[0]);
         }
         throw new ResponseException(400, "Expected: <username>, <password>, <email>");
@@ -69,63 +70,61 @@ public class Client {
     }
 
     public String list() throws ResponseException {
-//        assertSignedIn();
-//        var pets = server.listPets();
-//        var result = new StringBuilder();
-//        var gson = new Gson();
-//        for (var pet : pets) {
-//            result.append(gson.toJson(pet)).append('\n');
-//        }
-//        return result.toString();\
-        return "\n list";
+        assertLoggedIn();
+        var games = server.listGames(authToken);
+        return games.toString();
+//        return "\n list";
     }
 
     public String create(String... params) throws ResponseException {
-//        assertSignedIn();
-//        if (params.length == 1) {
-//            try {
-//                var id = Integer.parseInt(params[0]);
-//                var pet = getPet(id);
-//                if (pet != null) {
-//                    server.deletePet(id);
-//                    return String.format("%s says %s", pet.name(), pet.sound());
-//                }
-//            } catch (NumberFormatException ignored) {
-//            }
-//        }
-//        throw new ResponseException(400, "Expected: <pet id>");
-        return "\n create";
+        assertLoggedIn();
+        if (params.length == 1) {
+
+            CreateResult result = server.createGame(new CreateRequest(params[0]), authToken);
+            return String.format("Game %S created.", params[0]);
+        }
+        throw new ResponseException(400, "Expected: <game name>");
+//        return "\n create";
     }
 
-    public String join() throws ResponseException {
-//        assertSignedIn();
-//        var buffer = new StringBuilder();
-//        for (var pet : server.listPets()) {
-//            buffer.append(String.format("%s says %s%n", pet.name(), pet.sound()));
-//        }
-//
-//        server.deleteAllPets();
-//        return buffer.toString();
-        return "\n join";
+    public String join(String...params) throws ResponseException {
+      assertLoggedIn();
+        if (params.length == 2) {
+            ChessGame.TeamColor teamColor;
+            Integer gameID = Integer.parseInt(params[0]);
+            if (Objects.equals(params[1], "0")) {
+                 teamColor = ChessGame.TeamColor.WHITE;
+            } else if (Objects.equals(params[1], "1")) {
+                teamColor = ChessGame.TeamColor.BLACK;
+            } else {
+                throw new ResponseException(400, "Expected: <game id>, <team color>. For team color, input 0 for white and 1 for black.");
+            }
+            server.joinGame(new JoinRequest( gameID , teamColor), authToken);
+//            DrawBoard(gameID);
+            return String.format("Joined game %s", gameID );
+        }
+        throw new ResponseException(400, "Expected: <game id>, <team color>. For team color, input 0 for white and 1 for black.");
+//        return "\n join";
     }
 
     public String logout() throws ResponseException {
-//        assertSignedIn();
-//        ws.leavePetShop(visitorName);
-//        ws = null;
-//        state = State.SIGNEDOUT;
-//        return String.format("%s left the shop", visitorName);
-        return "\n logout";
+        assertLoggedIn();
+        server.logout(authToken);
+        authToken = null;
+        state = State.LOGGED_OUT;
+        return String.format("%s logged out", username);
+//        return "\n logout";
     }
 
-    private String observe() throws ResponseException {
-//        for (var pet : server.listPets()) {
-//            if (pet.id() == id) {
-//                return pet;
-//            }
-//        }
-//        return null;
-        return "\n observe";
+    private String observe(String...params) throws ResponseException {
+       assertLoggedIn();
+        if (params.length == 1) {
+            Integer gameID = Integer.parseInt(params[0]);
+//            DrawBoard(gameID);
+            return String.format("Observing game %s", gameID );
+        }
+        throw new ResponseException(400, "Expected: <game id>");
+//        return "\n observe";
     }
 
     private String clear() throws ResponseException {
