@@ -4,7 +4,7 @@ package ui;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import static ui.EscapeSequences.*
+import static ui.EscapeSequences.*;
 
 public class DrawBoard {
 
@@ -14,11 +14,13 @@ public class DrawBoard {
 
     private static int GAMEID;
 
+
+
     public static void DrawBoard(int gameID) {
         GAMEID = gameID;
     }
 
-    public static void draw(){
+    public static void main(String[] args){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -90,7 +92,7 @@ public class DrawBoard {
                     int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
 
                     out.print(EMPTY.repeat(prefixLength));
-                    printPlayer(out, rand.nextBoolean() ? X : O);
+//                    printPlayer(out, rand.nextBoolean() ? X : O);
                     out.print(EMPTY.repeat(suffixLength));
                 }
                 else {
