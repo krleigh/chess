@@ -32,7 +32,7 @@ public class Client {
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
-                case "create" -> create();
+                case "create" -> create(params);
                 case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
@@ -54,25 +54,28 @@ public class Client {
             username = result.username();
             return String.format("You registered as %s.", params[0]);
         }
-        throw new ResponseException(400, "Expected: <username>, <password>, <email>");
+        throw new ResponseException(400, "Expected: <username> <password> <email>");
 //        return "\n register";
     }
 
     public String login(String... params) throws ResponseException {
-        assertLoggedIn();
-        if (params.length >= 2) {
+        if (params.length == 2) {
+            state = State.LOGGED_IN;
             LoginResult result = server.login(new LoginRequest(params[0], params[1]));
             authToken = result.authToken();
             return String.format("You logged in as %s.", params[0]);
         }
-        throw new ResponseException(400, "Expected: <name> <CAT|DOG|FROG>");
+        throw new ResponseException(400, "Expected: <username> <password>");
 //        return "\n login";
     }
 
     public String list() throws ResponseException {
         assertLoggedIn();
         var games = server.listGames(authToken);
-        return games.toString();
+        for (var game : games.getGames()){
+            System.out.println(game.gameID() + " " + game.gameName() + "\n");
+        }
+        return "Games listed";
 //        return "\n list";
     }
 
@@ -82,8 +85,10 @@ public class Client {
 
             CreateResult result = server.createGame(new CreateRequest(params[0]), authToken);
             return String.format("Game %S created.", params[0]);
+        } else {
+            throw new ResponseException(400, "Expected: <game name>");
         }
-        throw new ResponseException(400, "Expected: <game name>");
+
 //        return "\n create";
     }
 
@@ -97,13 +102,13 @@ public class Client {
             } else if (Objects.equals(params[1], "1")) {
                 teamColor = ChessGame.TeamColor.BLACK;
             } else {
-                throw new ResponseException(400, "Expected: <game id>, <team color>. For team color, input 0 for white and 1 for black.");
+                throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
             }
             server.joinGame(new JoinRequest( gameID , teamColor), authToken);
 //            DrawBoard(gameID);
             return String.format("Joined game %s", gameID );
         }
-        throw new ResponseException(400, "Expected: <game id>, <team color>. For team color, input 0 for white and 1 for black.");
+        throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
 //        return "\n join";
     }
 
@@ -161,6 +166,10 @@ public class Client {
         if (state == State.LOGGED_OUT) {
             throw new ResponseException(400, "Error: Please log in");
         }
+    }
+
+    private void drawBoard(int gameID) {
+
     }
 
 }
