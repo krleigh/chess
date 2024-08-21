@@ -1,5 +1,6 @@
 package serverfacade;
 
+import model.GameData;
 import serverfacade.requestresult.*;
 import com.google.gson.Gson;
 import exception.ResponseException;
@@ -40,9 +41,9 @@ public class ServerFacade {
         return this.makeRequest("POST", path, create, CreateResult.class, auth);
     }
 
-    public void joinGame(JoinRequest join, String auth) throws ResponseException {
+    public GameData joinGame(JoinRequest join, String auth) throws ResponseException {
         var path = "/game";
-        this.makeRequest("PUT", path, join, null, auth);
+        return this.makeRequest("PUT", path, join, null, auth);
     }
 
     public void clear() throws ResponseException{

@@ -1,6 +1,8 @@
 package ui;
 
 
+import model.GameData;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
@@ -10,17 +12,15 @@ public class DrawBoard {
 
     private static final int BOARD_SIZE_IN_SQUARES = 10;
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
-    private static final int LINE_WIDTH_IN_PADDED_CHARS = 1;
 
-    private static int GAMEID;
+    private GameData GAME;
 
-
-
-    public static void DrawBoard(int gameID) {
-        GAMEID = gameID;
+    public DrawBoard(GameData game) {
+        GAME = game;
     }
 
-    public static void main(String[] args){
+
+    public static void draw(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -45,11 +45,6 @@ public class DrawBoard {
             if (boardCol == BOARD_SIZE_IN_SQUARES - 1) {
                 setBlack(out);
             }
-
-
-//            if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-//                out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
-//            }
         }
 
         out.println();
@@ -84,10 +79,6 @@ public class DrawBoard {
                 } else {
                     drawSquares(out, boardRow, boardCol);
                 }
-
-
-
-
             }
             setBlack(out);
             out.println();
@@ -105,30 +96,9 @@ public class DrawBoard {
         }
     }
 
-
-
-    private static void drawHorizontalLine(PrintStream out) {
-
-        int boardSizeInSpaces = BOARD_SIZE_IN_SQUARES * SQUARE_SIZE_IN_PADDED_CHARS +
-                (BOARD_SIZE_IN_SQUARES - 1) * LINE_WIDTH_IN_PADDED_CHARS;
-
-        for (int lineRow = 0; lineRow < LINE_WIDTH_IN_PADDED_CHARS; ++lineRow) {
-            setRed(out);
-            out.print(EMPTY.repeat(boardSizeInSpaces));
-
-            setBlack(out);
-            out.println();
-        }
-    }
-
     private static void setWhite(PrintStream out) {
         out.print(SET_BG_COLOR_WHITE);
         out.print(SET_TEXT_COLOR_WHITE);
-    }
-
-    private static void setRed(PrintStream out) {
-        out.print(SET_BG_COLOR_RED);
-        out.print(SET_TEXT_COLOR_RED);
     }
 
     private static void setBlack(PrintStream out) {

@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
+import model.GameData;
 import serverfacade.ServerFacade;
 import serverfacade.requestresult.*;
 
@@ -104,8 +105,9 @@ public class Client {
             } else {
                 throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
             }
-            server.joinGame(new JoinRequest( gameID , teamColor), authToken);
-//            DrawBoard(gameID);
+            GameData game = server.joinGame(new JoinRequest( gameID , teamColor), authToken);
+            new DrawBoard(game);
+            DrawBoard.draw();
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
@@ -168,8 +170,5 @@ public class Client {
         }
     }
 
-    private void drawBoard(int gameID) {
-
-    }
 
 }
