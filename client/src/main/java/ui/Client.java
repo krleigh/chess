@@ -107,7 +107,7 @@ public class Client {
             }
             GameData game = server.joinGame(new JoinRequest( gameID , teamColor), authToken);
             new DrawBoard(game);
-            DrawBoard.draw();
+//            DrawBoard.draw();
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
