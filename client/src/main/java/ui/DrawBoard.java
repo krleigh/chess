@@ -27,7 +27,7 @@ public class DrawBoard {
 
         drawHeaders(out);
 
-        drawTicTacToeBoard(out);
+        drawChessBoard(out);
 
         drawHeaders(out);
 
@@ -39,7 +39,7 @@ public class DrawBoard {
 
         setGrey(out);
 
-        String[] headers = { " ", "a", "b", "c", "d", "e", "f", "g", "h", " " };
+        String[] headers = { EMPTY, A, B, C, D, E, F, G, H, EMPTY };
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
             if (boardCol == BOARD_SIZE_IN_SQUARES - 1) {
@@ -47,9 +47,9 @@ public class DrawBoard {
             }
 
 
-            if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
-            }
+//            if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
+//                out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
+//            }
         }
 
         out.println();
@@ -73,50 +73,39 @@ public class DrawBoard {
         setGrey(out);
     }
 
-    private static void drawTicTacToeBoard(PrintStream out) {
+    private static void drawChessBoard(PrintStream out) {
 
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
 
-            drawRowOfSquares(out);
-
-            if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
-                // Draw horizontal row separator.
-                drawHorizontalLine(out);
-                setBlack(out);
-            }
-        }
-    }
-
-    private static void drawRowOfSquares(PrintStream out) {
-
-        for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                setWhite(out);
-
-                if (squareRow == SQUARE_SIZE_IN_PADDED_CHARS / 2) {
-                    int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-                    int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
-
-                    out.print(EMPTY.repeat(prefixLength));
-//                    printPlayer(out, rand.nextBoolean() ? X : O);
-                    out.print(EMPTY.repeat(suffixLength));
-                }
-                else {
+                if (boardCol == 0 || boardCol == 9) {
+                    setGrey(out);
                     out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+                } else {
+                    drawSquares(out, boardRow, boardCol);
                 }
 
-                if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                    // Draw vertical column separator.
-                    setRed(out);
-                    out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
-                }
 
-                setBlack(out);
+
+
             }
-
+            setBlack(out);
             out.println();
         }
     }
+
+    private static void drawSquares(PrintStream out, int boardRow, int boardCol) {
+        out.print(SET_TEXT_COLOR_WHITE);
+        if (boardCol % 2 == 0 && boardRow %2 == 0 || boardCol % 2 != 0 && boardRow % 2 != 0) {
+            setWhite(out);
+            out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+        } else {
+            setBlack(out);
+            out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+        }
+    }
+
+
 
     private static void drawHorizontalLine(PrintStream out) {
 
