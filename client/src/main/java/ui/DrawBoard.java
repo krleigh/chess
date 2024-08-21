@@ -75,14 +75,13 @@ public class DrawBoard {
     }
 
     private static void drawChessBoard(PrintStream out) {
-
-
         for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES-2; ++boardRow) {
 
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 if (boardCol == 0 || boardCol == 9) {
-                    setBlack(out);
-                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+                    out.print(SET_BG_COLOR_BLACK);
+                    out.print(SET_TEXT_COLOR_WHITE);
+                    out.print("\u2003" + (boardRow+1) +  "\u2003");
                 } else {
                     drawSquares(out, boardRow, boardCol);
                 }
