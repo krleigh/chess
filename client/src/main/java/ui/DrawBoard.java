@@ -9,7 +9,6 @@ import model.GameData;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 public class DrawBoard {
@@ -17,12 +16,12 @@ public class DrawBoard {
     private static final int BOARD_SIZE_IN_SQUARES = 10;
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
 
-    private static GameData GAME;
-    private static ChessGame.TeamColor COLOR;
+    private static GameData game;
+    private static ChessGame.TeamColor color;
 
     public DrawBoard(GameData game, ChessGame.TeamColor color) {
-        GAME = game;
-        COLOR = color;
+        DrawBoard.game = game;
+        DrawBoard.color = color;
     }
 
 
@@ -43,7 +42,7 @@ public class DrawBoard {
 
     private static void drawHeaders(PrintStream out) {
 
-        if (COLOR == ChessGame.TeamColor.BLACK) {
+        if (color == ChessGame.TeamColor.BLACK) {
             reversibleHeader(out, BOARD_SIZE_IN_SQUARES-1, -1, -1);
         } else {
             reversibleHeader(out, 0, BOARD_SIZE_IN_SQUARES, +1);
@@ -78,7 +77,7 @@ public class DrawBoard {
     }
 
     private static void drawChessBoard(PrintStream out) {
-        if (COLOR == ChessGame.TeamColor.BLACK) {
+        if (color == ChessGame.TeamColor.BLACK) {
             reversibleChessBoard(out, BOARD_SIZE_IN_SQUARES-3, BOARD_SIZE_IN_SQUARES-1, -1, -1, -1);
         } else {
             reversibleChessBoard(out, 0, 0, BOARD_SIZE_IN_SQUARES-2, BOARD_SIZE_IN_SQUARES, +1);
@@ -112,7 +111,7 @@ public class DrawBoard {
     }
 
     private static void printPiece(PrintStream out, int boardRow, int boardCol){
-        ChessPiece piece = GAME.game().getBoard().getPiece(new ChessPosition(boardRow+1, boardCol));
+        ChessPiece piece = game.game().getBoard().getPiece(new ChessPosition(boardRow+1, boardCol));
         String pieceUI = EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS);
         if (piece != null) {
             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
@@ -160,15 +159,6 @@ public class DrawBoard {
         out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_DARK_GREY);
 
-    }
-
-    private static void printPlayer(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_TEXT_COLOR_BLACK);
-
-        out.print(player);
-
-        setWhite(out);
     }
 
 
