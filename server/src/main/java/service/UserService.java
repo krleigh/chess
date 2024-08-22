@@ -43,7 +43,7 @@ public class UserService {
         }
 
         if (userDAO.getUser(register.username()) != null) {
-            throw new ResponseException(403, "Error: already taken");}
+            throw new ResponseException(403, "Error: username already taken");}
         String hashedPassword = BCrypt.hashpw(register.password(), BCrypt.gensalt());
         RegisterRequest hashedRegister = new RegisterRequest(register.username(), hashedPassword, register.email());
         UserData user = userDAO.createUser(hashedRegister);
@@ -54,8 +54,11 @@ public class UserService {
     public LoginResult login(LoginRequest login) throws ResponseException {
 
         var user = userDAO.getUser(login.username());
-        if(user == null || !BCrypt.checkpw(login.password(), user.password())) {
-            throw new ResponseException(401, "Error: unauthorized");
+        if (user == null) {
+            throw new ResponseException(401, "Error: unauthorized, username does not exist");
+        }
+        if(!BCrypt.checkpw(login.password(), user.password())) {
+            throw new ResponseException(401, "Error: unauthorized, incorrect password");
         }
         AuthData auth = authDAO.createAuth(login.username());
         return new LoginResult(login.username(), auth.authToken());

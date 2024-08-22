@@ -13,6 +13,7 @@ import java.util.Objects;
 public class Client {
     private String authToken;
     private String username;
+    private DrawBoard board;
     private final ServerFacade server;
     private final String serverUrl;
     private final Repl repl;
@@ -81,30 +82,33 @@ public class Client {
     public String create(String... params) throws ResponseException {
         assertLoggedIn();
         if (params.length == 1) {
-
             CreateResult result = server.createGame(new CreateRequest(params[0]), authToken);
             return String.format("Game %S created.", params[0]);
         } else {
-            throw new ResponseException(400, "Expected: <game name>");
+            throw new ResponseException(400, "Expected: <game name>, names cannot include spaces");
         }
     }
 
     public String join(String...params) throws ResponseException {
       assertLoggedIn();
+      if (state == State.GAMEPLAY){
+          return "Please leave current game to join another.";
+      }
         if (params.length == 2) {
             ChessGame.TeamColor teamColor;
             Integer gameID = Integer.parseInt(params[0]);
-            if (Objects.equals(params[1], "0")) {
+            if (Objects.equals(params[1], "white")) {
                  teamColor = ChessGame.TeamColor.WHITE;
-            } else if (Objects.equals(params[1], "1")) {
+            } else if (Objects.equals(params[1], "black")) {
                 teamColor = ChessGame.TeamColor.BLACK;
             } else {
-                throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
+                throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");
             }
             server.joinGame(new JoinRequest(gameID , teamColor), authToken);
             var game = findGame(gameID, server.listGames(authToken).getGames());
-            DrawBoard drawBoard = new DrawBoard(game, teamColor);
-            drawBoard.draw();
+            board = new DrawBoard(game, teamColor);
+            board.draw();
+            state = State.GAMEPLAY;
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
@@ -120,6 +124,9 @@ public class Client {
 
     private String observe(String...params) throws ResponseException {
        assertLoggedIn();
+        if (state == State.GAMEPLAY){
+            return "Please leave current game to join another.";
+        }
         if (params.length == 1) {
             Integer gameID = Integer.parseInt(params[0]);
             var games = server.listGames(authToken);
@@ -127,11 +134,10 @@ public class Client {
             if (game == null) {
                 throw new ResponseException(400, "Error: Invalid game id");
             } else {
-                DrawBoard drawBoard = new DrawBoard(game, ChessGame.TeamColor.WHITE);
-                drawBoard.draw();
-                DrawBoard drawBoard2 = new DrawBoard(game, ChessGame.TeamColor.BLACK);
-                drawBoard2.draw();
+                board = new DrawBoard(game, ChessGame.TeamColor.WHITE);
+                board.draw();
             }
+            state = State.GAMEPLAY;
             return String.format("Observing game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id>");
@@ -164,7 +170,7 @@ public class Client {
                     """;
         } else if (state == State.GAMEPLAY) {
             return """
-                        
+                        - leave - leave current game
                         - help - with possible commands
                         """;
         }
