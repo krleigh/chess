@@ -56,7 +56,6 @@ public class Client {
             return String.format("You registered as %s.", params[0]);
         }
         throw new ResponseException(400, "Expected: <username> <password> <email>");
-//        return "\n register";
     }
 
     public String login(String... params) throws ResponseException {
@@ -67,7 +66,6 @@ public class Client {
             return String.format("You logged in as %s.", params[0]);
         }
         throw new ResponseException(400, "Expected: <username> <password>");
-//        return "\n login";
     }
 
     public String list() throws ResponseException {
@@ -77,7 +75,6 @@ public class Client {
             System.out.println(game.gameID() + " " + game.gameName() + "\n");
         }
         return "Games listed";
-//        return "\n list";
     }
 
     public String create(String... params) throws ResponseException {
@@ -89,8 +86,6 @@ public class Client {
         } else {
             throw new ResponseException(400, "Expected: <game name>");
         }
-
-//        return "\n create";
     }
 
     public String join(String...params) throws ResponseException {
@@ -112,7 +107,6 @@ public class Client {
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
-//        return "\n join";
     }
 
     public String logout() throws ResponseException {
@@ -121,7 +115,6 @@ public class Client {
         authToken = null;
         state = State.LOGGED_OUT;
         return String.format("%s logged out", username);
-//        return "\n logout";
     }
 
     private String observe(String...params) throws ResponseException {
@@ -135,11 +128,12 @@ public class Client {
             } else {
                 DrawBoard drawBoard = new DrawBoard(game, ChessGame.TeamColor.WHITE);
                 drawBoard.draw();
+                DrawBoard drawBoard2 = new DrawBoard(game, ChessGame.TeamColor.BLACK);
+                drawBoard2.draw();
             }
             return String.format("Observing game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id>");
-//        return "\n observe";
     }
 
     private GameData findGame(Integer gameID, GameData[] games) {
