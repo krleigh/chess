@@ -62,6 +62,7 @@ public class Client {
         if (params.length == 2) {
             state = State.LOGGED_IN;
             LoginResult result = server.login(new LoginRequest(params[0], params[1]));
+            username = params[0];
             authToken = result.authToken();
             return String.format("You logged in as %s.", params[0]);
         }
