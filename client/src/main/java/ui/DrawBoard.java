@@ -18,11 +18,11 @@ public class DrawBoard {
     private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
 
     private static GameData GAME;
+    private static ChessGame.TeamColor COLOR;
 
-    public DrawBoard(GameData game) {
+    public DrawBoard(GameData game, ChessGame.TeamColor color) {
         GAME = game;
-
-
+        COLOR = color;
     }
 
 
@@ -30,6 +30,8 @@ public class DrawBoard {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
+
+        COLOR = ChessGame.TeamColor.BLACK;
 
         drawHeaders(out);
 
@@ -43,16 +45,20 @@ public class DrawBoard {
 
     private static void drawHeaders(PrintStream out) {
 
-        setGrey(out);
-
-        String[] headers = { EMPTY, A, B, C, D, E, F, G, H, EMPTY };
-        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-            drawHeader(out, headers[boardCol]);
-            if (boardCol == BOARD_SIZE_IN_SQUARES - 1) {
-                setBlack(out);
-            }
+        if (COLOR == ChessGame.TeamColor.BLACK) {
+            reversibleHeader(out, BOARD_SIZE_IN_SQUARES-1, -1, -1);
+        } else {
+            reversibleHeader(out, 0, BOARD_SIZE_IN_SQUARES, +1);
         }
+    }
 
+    private static void reversibleHeader(PrintStream out, int start, int end, int step) {
+        String[] headers = { EMPTY, A, B, C, D, E, F, G, H, EMPTY };
+
+        for (int boardCol = start; boardCol != end; boardCol += step) {
+            drawHeader(out, headers[boardCol]);
+        }
+        setBlack(out);
         out.println();
     }
 
@@ -66,18 +72,24 @@ public class DrawBoard {
     }
 
     private static void printHeaderText(PrintStream out, String player) {
-        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_BG_COLOR_DARK_GREY);
         out.print(SET_TEXT_COLOR_WHITE);
 
         out.print(player);
 
-        setGrey(out);
     }
 
     private static void drawChessBoard(PrintStream out) {
-        for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES-2; ++boardRow) {
+        if (COLOR == ChessGame.TeamColor.BLACK) {
+            reversibleChessBoard(out, BOARD_SIZE_IN_SQUARES-3, -1, -1);
+        } else {
+            reversibleChessBoard(out, 0, BOARD_SIZE_IN_SQUARES, +1);
+        }
+    }
+    private static void reversibleChessBoard(PrintStream out, int start, int end, int step) {
+        for (int boardRow = start; boardRow != end-2; boardRow += step ) {
 
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+            for (int boardCol = start; boardCol != end; boardCol += step) {
                 if (boardCol == 0 || boardCol == 9) {
                     out.print(SET_BG_COLOR_BLACK);
                     out.print(SET_TEXT_COLOR_WHITE);
@@ -90,7 +102,6 @@ public class DrawBoard {
             out.println();
         }
     }
-
     private static void drawSquares(PrintStream out, int boardRow, int boardCol) {
 
         if (boardCol % 2 == 0 && boardRow %2 == 0 || boardCol % 2 != 0 && boardRow % 2 != 0) {
