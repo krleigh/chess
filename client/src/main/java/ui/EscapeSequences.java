@@ -61,7 +61,7 @@ public class EscapeSequences {
     public static final String BLACK_PAWN = " ♟ ";
     public static final String EMPTY = " \u2003 ";
 
-    public static final String A = " \u200A\u200Aa\u200A ";
+    public static final String A = " \u200A\u200Aa\u200A\u200A ";
     public static final String B = " \u200A\u200Ab\u200A ";
     public static final String C = " \u200A\u200Ac\u200A ";
     public static final String D = " \u200A\u200Ad\u200A ";

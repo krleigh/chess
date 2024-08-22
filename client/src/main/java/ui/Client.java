@@ -105,9 +105,10 @@ public class Client {
             } else {
                 throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
             }
-            GameData game = server.joinGame(new JoinRequest( gameID , teamColor), authToken);
-            new DrawBoard(game, teamColor);
-//            DrawBoard.draw();
+            server.joinGame(new JoinRequest(gameID , teamColor), authToken);
+            var game = findGame(gameID, server.listGames(authToken).getGames());
+            DrawBoard drawBoard = new DrawBoard(game, teamColor);
+            drawBoard.draw();
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input 0 for white and 1 for black.");
@@ -127,11 +128,27 @@ public class Client {
        assertLoggedIn();
         if (params.length == 1) {
             Integer gameID = Integer.parseInt(params[0]);
-//            DrawBoard(gameID);
+            var games = server.listGames(authToken);
+            var game = findGame(gameID, games.getGames());
+            if (game == null) {
+                throw new ResponseException(400, "Error: Invalid game id");
+            } else {
+                DrawBoard drawBoard = new DrawBoard(game, ChessGame.TeamColor.WHITE);
+                drawBoard.draw();
+            }
             return String.format("Observing game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id>");
 //        return "\n observe";
+    }
+
+    private GameData findGame(Integer gameID, GameData[] games) {
+        for (var game : games) {
+            if (game.gameID() == gameID) {
+                return game;
+            }
+        }
+        return null;
     }
 
     private String clear() throws ResponseException {

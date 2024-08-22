@@ -41,9 +41,9 @@ public class ServerFacade {
         return this.makeRequest("POST", path, create, CreateResult.class, auth);
     }
 
-    public GameData joinGame(JoinRequest join, String auth) throws ResponseException {
+    public void joinGame(JoinRequest join, String auth) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("PUT", path, join, null, auth);
+        this.makeRequest("PUT", path, join, null, auth);
     }
 
     public void clear() throws ResponseException{

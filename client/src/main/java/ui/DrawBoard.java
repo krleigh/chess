@@ -26,12 +26,10 @@ public class DrawBoard {
     }
 
 
-    public static void main(String[] args){
+    public static void draw(){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
-
-        COLOR = ChessGame.TeamColor.BLACK;
 
         drawHeaders(out);
 
@@ -81,21 +79,21 @@ public class DrawBoard {
 
     private static void drawChessBoard(PrintStream out) {
         if (COLOR == ChessGame.TeamColor.BLACK) {
-            reversibleChessBoard(out, BOARD_SIZE_IN_SQUARES-3, -1, -1);
+            reversibleChessBoard(out, BOARD_SIZE_IN_SQUARES-3, BOARD_SIZE_IN_SQUARES-1, -1, -1, -1);
         } else {
-            reversibleChessBoard(out, 0, BOARD_SIZE_IN_SQUARES, +1);
+            reversibleChessBoard(out, 0, 0, BOARD_SIZE_IN_SQUARES-2, BOARD_SIZE_IN_SQUARES, +1);
         }
     }
-    private static void reversibleChessBoard(PrintStream out, int start, int end, int step) {
-        for (int boardRow = start; boardRow != end-2; boardRow += step ) {
+    private static void reversibleChessBoard(PrintStream out, int startRow, int startCol, int endRow, int endCol, int step) {
+        for (int boardRow = startRow; boardRow != endRow; boardRow += step ) {
 
-            for (int boardCol = start; boardCol != end; boardCol += step) {
+            for (int boardCol = startCol; boardCol != endCol; boardCol += step) {
                 if (boardCol == 0 || boardCol == 9) {
-                    out.print(SET_BG_COLOR_BLACK);
+                    out.print(SET_BG_COLOR_DARK_GREY);
                     out.print(SET_TEXT_COLOR_WHITE);
-                    out.print("\u2003" + (boardRow+1) +  "\u2003");
+                    out.print("\u2003" + (BOARD_SIZE_IN_SQUARES-3-boardRow+1) +  "\u2003");
                 } else {
-                    drawSquares(out, boardRow, boardCol);
+                    drawSquares(out, BOARD_SIZE_IN_SQUARES-3-boardRow, boardCol);
                 }
             }
             setBlack(out);
@@ -114,8 +112,7 @@ public class DrawBoard {
     }
 
     private static void printPiece(PrintStream out, int boardRow, int boardCol){
-        var game = new ChessGame();
-        ChessPiece piece = game.getBoard().getPiece(new ChessPosition(boardRow+1, boardCol));
+        ChessPiece piece = GAME.game().getBoard().getPiece(new ChessPosition(boardRow+1, boardCol));
         String pieceUI = EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS);
         if (piece != null) {
             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
