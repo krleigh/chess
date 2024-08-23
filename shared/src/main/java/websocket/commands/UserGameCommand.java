@@ -41,22 +41,22 @@ public class UserGameCommand {
         return gameID;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof UserGameCommand)) {
-            return false;
-        }
-        UserGameCommand that = (UserGameCommand) o;
-        return getCommandType() == that.getCommandType() &&
-                Objects.equals(getAuthString(), that.getAuthString()) &&
-                Objects.equals(getGameID(), that.getGameID());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getCommandType(), getAuthString(), getGameID());
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) {
+//            return true;
+//        }
+//        if (!(o instanceof UserGameCommand)) {
+//            return false;
+//        }
+//        UserGameCommand that = (UserGameCommand) o;
+//        return getCommandType() == that.getCommandType() &&
+//                Objects.equals(getAuthString(), that.getAuthString()) &&
+//                Objects.equals(getGameID(), that.getGameID());
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(getCommandType(), getAuthString(), getGameID());
+//    }
 }
