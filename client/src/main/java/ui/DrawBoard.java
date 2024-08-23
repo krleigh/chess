@@ -40,19 +40,6 @@ public class DrawBoard {
         out.print(SET_TEXT_COLOR_WHITE);
     }
 
-    public static void drawBoth(){
-        draw();
-        if (color == ChessGame.TeamColor.BLACK) {
-            color = ChessGame.TeamColor.WHITE;
-            draw();
-            color = ChessGame.TeamColor.BLACK;
-        } else {
-            color = ChessGame.TeamColor.BLACK;
-            draw();
-            color = ChessGame.TeamColor.WHITE;
-        }
-    }
-
     private static void drawHeaders(PrintStream out) {
 
         if (color == ChessGame.TeamColor.BLACK) {
