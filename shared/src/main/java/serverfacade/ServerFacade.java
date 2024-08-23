@@ -88,7 +88,7 @@ public class ServerFacade {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             var exception = readBody(http, ErrorResult.class);
-            throw new ResponseException(status, "failure: " + status + " " + exception.getMessage() );
+            throw new ResponseException(status, exception.getMessage() );
         }
     }
 

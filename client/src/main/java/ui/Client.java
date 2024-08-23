@@ -8,6 +8,7 @@ import serverfacade.ServerFacade;
 import serverfacade.requestresult.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class Client {
@@ -18,6 +19,7 @@ public class Client {
     private final String serverUrl;
     private final Repl repl;
     private State state = State.LOGGED_OUT;
+    private HashMap<Integer, GameData> games = new HashMap<>();
 
 
     public Client (String serverUrl, Repl repl) {
@@ -60,6 +62,9 @@ public class Client {
     }
 
     public String login(String... params) throws ResponseException {
+        if (state == State.LOGGED_IN) {
+            return String.format("Already logged in as %s", username);
+        }
         if (params.length == 2) {
             state = State.LOGGED_IN;
             LoginResult result = server.login(new LoginRequest(params[0], params[1]));
@@ -72,11 +77,20 @@ public class Client {
 
     public String list() throws ResponseException {
         assertLoggedIn();
-        var games = server.listGames(authToken);
-        for (var game : games.getGames()){
-            System.out.println(game.gameID() + " " + game.gameName() + "\n");
-        }
+        listHelper(true);
         return "Games listed";
+    }
+
+    private void listHelper(Boolean print) throws ResponseException {
+        var gameslist = server.listGames(authToken);
+        Integer key = 1;
+        for (var game : gameslist.getGames()){
+            this.games.put(key, game);
+            if (print) {
+                System.out.println(key + " " + game.gameName() + " | white player: " + game.whiteUsername() + " | black player: " + game.blackUsername() + "\n");
+            }
+            ++key;
+        }
     }
 
     public String create(String... params) throws ResponseException {
@@ -91,12 +105,18 @@ public class Client {
 
     public String join(String...params) throws ResponseException {
       assertLoggedIn();
-      if (state == State.GAMEPLAY){
-          return "Please leave current game to join another.";
-      }
         if (params.length == 2) {
+
             ChessGame.TeamColor teamColor;
-            Integer gameID = Integer.parseInt(params[0]);
+            Integer ID;
+
+            try{ID = Integer.parseInt(params[0]);}
+            catch (Exception e) { throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");}
+
+            listHelper(false);
+            if (!games.containsKey(ID)) { return "Invalid game ID.";}
+
+
             if (Objects.equals(params[1], "white")) {
                  teamColor = ChessGame.TeamColor.WHITE;
             } else if (Objects.equals(params[1], "black")) {
@@ -104,6 +124,10 @@ public class Client {
             } else {
                 throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");
             }
+
+
+            var gameID = games.get(ID).gameID();
+
             server.joinGame(new JoinRequest(gameID , teamColor), authToken);
             var game = findGame(gameID, server.listGames(authToken).getGames());
             board = new DrawBoard(game, teamColor);
@@ -124,9 +148,6 @@ public class Client {
 
     private String observe(String...params) throws ResponseException {
        assertLoggedIn();
-        if (state == State.GAMEPLAY){
-            return "Please leave current game to join another.";
-        }
         if (params.length == 1) {
             Integer gameID = Integer.parseInt(params[0]);
             var games = server.listGames(authToken);
@@ -165,7 +186,6 @@ public class Client {
                     - join <ID> [WHITE|BLACK] - a game
                     - observe <ID> - a game
                     - logout - when you are done
-                    - quit - playing chess
                     - help - with possible commands
                     """;
         } else if (state == State.GAMEPLAY) {
