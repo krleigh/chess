@@ -62,7 +62,7 @@ public class Client {
     }
 
     public String login(String... params) throws ResponseException {
-        if (state == State.LOGGED_IN) {
+        if (state != State.LOGGED_OUT) {
             return String.format("Already logged in as %s", username);
         }
         if (params.length == 2) {
