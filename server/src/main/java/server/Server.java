@@ -8,17 +8,21 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.*;
+import websocket.WebSocketHandler;
 
 public class Server {
 
     private final UserService userService;
     private final GameService gameService;
 
+    private final WebSocketHandler webSocketHandler;
+
     private final Gson gson = new Gson();
 
-    public Server()  {
+    public Server() {
         userService = new UserService();
         gameService = new GameService();
+        webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {

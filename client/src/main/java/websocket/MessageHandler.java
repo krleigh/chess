@@ -1,4 +1,7 @@
 package websocket;
 
-public class MessageHandler {
+import websocket.messages.ServerMessage;
+
+public interface MessageHandler {
+    void notify(ServerMessage serverMessage);
 }

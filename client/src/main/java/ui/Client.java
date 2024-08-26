@@ -6,6 +6,8 @@ import exception.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
 import serverfacade.requestresult.*;
+import websocket.MessageHandler;
+import websocket.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,12 +16,16 @@ import java.util.Objects;
 public class Client {
     private String authToken;
     private String username;
-    private DrawBoard board;
+
     private final ServerFacade server;
     private final String serverUrl;
-    private final Repl repl;
+    private final MessageHandler repl;
+    public WebSocketFacade ws;
     private State state = State.LOGGED_OUT;
+
+
     private HashMap<Integer, GameData> games = new HashMap<>();
+    private DrawBoard board;
 
 
     public Client (String serverUrl, Repl repl) {
@@ -128,11 +134,17 @@ public class Client {
 
             var gameID = games.get(ID).gameID();
 
+            state = State.GAMEPLAY;
+            ws = new WebSocketFacade(serverUrl, repl);
+
             server.joinGame(new JoinRequest(gameID , teamColor), authToken);
             var game = findGame(gameID, server.listGames(authToken).getGames());
             board = new DrawBoard(game, teamColor);
             board.draw();
-            state = State.GAMEPLAY;
+
+
+
+
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input black or white");
