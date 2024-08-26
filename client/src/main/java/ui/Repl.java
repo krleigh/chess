@@ -1,16 +1,18 @@
 package ui;
 
 
-import websocket.MessageHandler;
+import model.GameData;
+import websocket.GameHandler;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class Repl implements MessageHandler {
+public class Repl implements GameHandler {
 
     private final Client client;
+    public GameData game;
 
     public Repl(String serverUrl) {
         client = new Client(serverUrl, this);
@@ -37,6 +39,10 @@ public class Repl implements MessageHandler {
         System.out.println();
     }
 
+    public GameData getGame(){
+        return game;
+    }
+
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
@@ -44,5 +50,10 @@ public class Repl implements MessageHandler {
     @Override
     public void notify(ServerMessage serverMessage) {
         System.out.println(SET_TEXT_COLOR_RED + serverMessage.getMessage());
+    }
+
+    @Override
+    public void updateGame(GameData game) {
+        this.game = game;
     }
 }

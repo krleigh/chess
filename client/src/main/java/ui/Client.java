@@ -1,12 +1,11 @@
 package ui;
 
 import chess.ChessGame;
-import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
 import serverfacade.requestresult.*;
-import websocket.MessageHandler;
+import websocket.GameHandler;
 import websocket.WebSocketFacade;
 
 import java.util.Arrays;
@@ -19,7 +18,7 @@ public class Client {
 
     private final ServerFacade server;
     private final String serverUrl;
-    private final MessageHandler repl;
+    private final GameHandler repl;
     public WebSocketFacade ws;
     private State state = State.LOGGED_OUT;
 

@@ -16,9 +16,9 @@ import java.net.URI;
 public class WebSocketFacade extends Endpoint {
 
     Session session;
-    MessageHandler messageHandler;
+    GameHandler gameHandler;
 
-    public WebSocketFacade(String url, MessageHandler messageHandler) throws ResponseException {
+    public WebSocketFacade(String url, GameHandler gameHandler) throws ResponseException {
 
         try{
             url = url.replace("http", "ws");
@@ -38,7 +38,7 @@ public class WebSocketFacade extends Endpoint {
                         case LOAD_GAME -> accessMessage = gson.fromJson(message, ServerLoadGame.class);
                         case ERROR -> accessMessage = gson.fromJson(message, ServerError.class);
                     }
-                    messageHandler.notify(accessMessage);
+                    gameHandler.notify(accessMessage);
                 }
             });
 
@@ -52,6 +52,4 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
 
     }
-
-    public void
 }
