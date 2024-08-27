@@ -8,9 +8,11 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import javax.websocket.OnMessage;
 import java.io.IOException;
 
 @WebSocket
@@ -27,8 +29,9 @@ public class WebSocketHandler {
 
     }
 
-        @OnWebSocketMessage
+    @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, ResponseException {
+        System.out.println("Received Message: " + message);
             UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
             switch (userGameCommand.getCommandType()){
                 case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
@@ -41,9 +44,12 @@ public class WebSocketHandler {
     private void connect(String authToken, Integer gameID, Session session) throws IOException, ResponseException {
         var username = userService.getAuth(authToken).username();
         connections.add(username, session);
-        var message = String.format("%s joined the %s", username, gameID.toString());
-        var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var msg = String.format("%s joined the %s", username, gameID.toString());
+        var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         connections.broadcast(username, serverMessage);
+
+        var loadMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, gameService.getGame(gameID));
+        connections.send(username, loadMessage);
     }
 
     private void makeMove() {

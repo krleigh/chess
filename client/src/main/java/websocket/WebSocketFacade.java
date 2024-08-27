@@ -46,7 +46,7 @@ public class WebSocketFacade extends Endpoint {
                         case LOAD_GAME -> accessMessage = gson.fromJson(message, LoadGameMessage.class);
                         case ERROR -> accessMessage = gson.fromJson(message, ErrorMessage.class);
                     }
-                    gameHandler.notify(accessMessage);
+                    gameHandler.notify(serverMessage);
                 }
             });
 

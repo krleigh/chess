@@ -159,6 +159,7 @@ public class Client {
     public String leave() throws ResponseException {
         assertGamePlay();
         ws.leave(authToken);
+        state = State.LOGGED_IN;
         return "Left game.";
     }
 
