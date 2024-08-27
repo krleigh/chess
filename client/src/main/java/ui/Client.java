@@ -46,6 +46,9 @@ public class Client {
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout();
+                case "leave" -> leave();
+                case "move" -> move();
+                case "resign" -> resign();
                 case "clear" -> clear();
                 case "quit" -> "quit";
                 default -> help();
@@ -78,6 +81,14 @@ public class Client {
             return String.format("You logged in as %s.", params[0]);
         }
         throw new ResponseException(400, "Expected: <username> <password>");
+    }
+
+    public String logout() throws ResponseException {
+        assertLoggedIn();
+        server.logout(authToken);
+        authToken = null;
+        state = State.LOGGED_OUT;
+        return String.format("%s logged out", username);
     }
 
     public String list() throws ResponseException {
@@ -130,31 +141,33 @@ public class Client {
                 throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");
             }
 
-
             var gameID = games.get(ID).gameID();
 
             state = State.GAMEPLAY;
-            ws = new WebSocketFacade(serverUrl, repl);
+            ws = new WebSocketFacade(serverUrl, repl, gameID);
 
             server.joinGame(new JoinRequest(gameID , teamColor), authToken);
             var game = findGame(gameID, server.listGames(authToken).getGames());
             board = new DrawBoard(game, teamColor);
             board.draw();
 
-
-
-
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input black or white");
     }
 
-    public String logout() throws ResponseException {
-        assertLoggedIn();
-        server.logout(authToken);
-        authToken = null;
-        state = State.LOGGED_OUT;
-        return String.format("%s logged out", username);
+    public String leave() throws ResponseException {
+        assertGamePlay();
+        ws.leave(authToken);
+        return "Left game.";
+    }
+
+    public String move(String...params) throws ResponseException {
+        return "Moved.";
+    }
+
+    public String resign() throws ResponseException {
+        return "Resigned game.";
     }
 
     private String observe(String...params) throws ResponseException {
@@ -169,7 +182,7 @@ public class Client {
                 board = new DrawBoard(game, ChessGame.TeamColor.WHITE);
                 board.draw();
             }
-            state = State.GAMEPLAY;
+            state = State.OBSERVE;
             return String.format("Observing game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id>");
@@ -201,7 +214,18 @@ public class Client {
                     """;
         } else if (state == State.GAMEPLAY) {
             return """
+                        - redraw - redraw the chess board
                         - leave - leave current game
+                        - show <ChessPosition> - show legal moves for piece in this position
+                        - move <ChessMove> - make a move
+                        - resign - resign current game
+                        - help - with possible commands
+                        """;
+        } else if (state == State.OBSERVE) {
+            return """
+                        - redraw - redraw the chess board
+                        - leave - leave current game
+                        - show <ChessPosition> - show legal moves for piece in this position
                         - help - with possible commands
                         """;
         }
@@ -216,6 +240,12 @@ public class Client {
     private void assertLoggedIn() throws ResponseException {
         if (state == State.LOGGED_OUT) {
             throw new ResponseException(400, "Error: Please log in");
+        }
+    }
+
+    private void assertGamePlay() throws ResponseException {
+        if (state != State.GAMEPLAY) {
+            throw new ResponseException(400, "Error: not in gameplay mode");
         }
     }
 

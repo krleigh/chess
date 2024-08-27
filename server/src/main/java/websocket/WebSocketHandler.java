@@ -1,13 +1,14 @@
 package websocket;
 
 import com.google.gson.Gson;
+import exception.ResponseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerNotification;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class WebSocketHandler {
     }
 
         @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws IOException, ResponseException {
             UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
             switch (userGameCommand.getCommandType()){
                 case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
@@ -37,11 +38,11 @@ public class WebSocketHandler {
             }
         }
 
-    private void connect(String authToken, Integer gameID, Session session) throws IOException {
-        userService.
+    private void connect(String authToken, Integer gameID, Session session) throws IOException, ResponseException {
+        var username = userService.getAuth(authToken).username();
         connections.add(username, session);
         var message = String.format("%s joined the %s", username, gameID.toString());
-        var serverMessage = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, serverMessage);
     }
 
@@ -49,10 +50,11 @@ public class WebSocketHandler {
 
     }
 
-    private void leave(String username) throws IOException {
+    private void leave(String authToken) throws IOException, ResponseException {
+        var username = userService.getAuth(authToken).username();
         connections.remove(username);
         var message = String.format("%s left the game.", username);
-        var serverMessage = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, serverMessage);
     }
 

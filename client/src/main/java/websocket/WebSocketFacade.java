@@ -2,9 +2,12 @@ package websocket;
 
 import com.google.gson.Gson;
 import exception.ResponseException;
-import websocket.messages.ServerError;
-import websocket.messages.ServerLoadGame;
-import websocket.messages.ServerNotification;
+import websocket.commands.ConnectCommand;
+import websocket.commands.LeaveCommand;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 
@@ -18,8 +21,12 @@ public class WebSocketFacade extends Endpoint {
 
     Session session;
     GameHandler gameHandler;
+    Integer gameID;
 
-    public WebSocketFacade(String url, GameHandler gameHandler) throws ResponseException {
+    public WebSocketFacade(String url, GameHandler gameHandler, Integer gameID) throws ResponseException {
+
+        this.gameHandler = gameHandler;
+        this.gameID = gameID;
 
         try{
             url = url.replace("http", "ws");
@@ -35,9 +42,9 @@ public class WebSocketFacade extends Endpoint {
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                     ServerMessage accessMessage = serverMessage;
                     switch (serverMessage.getServerMessageType()) {
-                        case NOTIFICATION -> accessMessage = gson.fromJson(message, ServerNotification.class);
-                        case LOAD_GAME -> accessMessage = gson.fromJson(message, ServerLoadGame.class);
-                        case ERROR -> accessMessage = gson.fromJson(message, ServerError.class);
+                        case NOTIFICATION -> accessMessage = gson.fromJson(message, NotificationMessage.class);
+                        case LOAD_GAME -> accessMessage = gson.fromJson(message, LoadGameMessage.class);
+                        case ERROR -> accessMessage = gson.fromJson(message, ErrorMessage.class);
                     }
                     gameHandler.notify(accessMessage);
                 }
@@ -51,6 +58,23 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void leave(String authToken) throws ResponseException {
+        try {
+            var command = new LeaveCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void move() throws ResponseException {
 
     }
+
+    public void resign() throws ResponseException {
+
+    }
+
 }

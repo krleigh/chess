@@ -64,6 +64,7 @@ public class MySQLUserDAO implements UserDAO {
         return null;
     }
 
+
     public void deleteUser(String username) throws ResponseException{
         var statement = "DELETE FROM user WHERE username=?";
         executeUpdate(statement, username);

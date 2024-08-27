@@ -88,13 +88,17 @@ public class UserService {
     public UserData getUser(String username) throws ResponseException {
         var user = userDAO.getUser(username);
         if (user == null ) {
-            throw new ResponseException(401, "Error: unauthorized");
+            throw new ResponseException(401, "Error: unauthorized, user does not exist");
         }
         return user;
     }
 
-    public AuthData getAuth(String authToken) throw ResponseException {
-
+    public AuthData getAuth(String authToken) throws ResponseException {
+        var auth = authDAO.getAuth(authToken);
+        if (auth == null) {
+            throw new ResponseException(401, "Error: auth token not in database");
+        }
+        return auth;
     }
 
     public Collection<AuthData> listAuths() throws ResponseException {
