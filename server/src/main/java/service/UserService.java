@@ -93,6 +93,10 @@ public class UserService {
         return user;
     }
 
+    public AuthData getAuth(String authToken) throw ResponseException {
+
+    }
+
     public Collection<AuthData> listAuths() throws ResponseException {
         return authDAO.listAuths();
     }

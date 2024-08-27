@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import service.GameService;
+import service.UserService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerNotification;
 import websocket.messages.ServerMessage;
@@ -13,7 +15,16 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
 
-        private final WebSocketSessions connections = new WebSocketSessions();
+    private final WebSocketSessions connections = new WebSocketSessions();
+
+    private final UserService userService;
+    private final GameService gameService;
+
+    public WebSocketHandler(UserService userService, GameService gameService) {
+        this.userService = userService;
+        this.gameService = gameService;
+
+    }
 
         @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
@@ -26,7 +37,8 @@ public class WebSocketHandler {
             }
         }
 
-    private void connect(String username, Integer gameID, Session session) throws IOException {
+    private void connect(String authToken, Integer gameID, Session session) throws IOException {
+        userService.
         connections.add(username, session);
         var message = String.format("%s joined the %s", username, gameID.toString());
         var serverMessage = new ServerNotification(ServerMessage.ServerMessageType.NOTIFICATION, message);
