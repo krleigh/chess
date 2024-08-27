@@ -56,6 +56,23 @@ public class GameService {
 
     }
 
+    public void leaveGame(String username, Integer gameID) throws ResponseException {
+        if (gameDAO.getGame(gameID) == null){ throw new ResponseException(400, "Error: bad request");}
+        GameData oldGame = gameDAO.getGame(gameID);
+
+        GameData newGame;
+
+        if (Objects.equals(username, oldGame.blackUsername())) {
+            newGame = new GameData(gameID, oldGame.whiteUsername(), null, oldGame.gameName(), oldGame.game());
+        } else if (Objects.equals(username, oldGame.whiteUsername())) {
+            newGame = new GameData(gameID, null, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
+        } else {
+            return;
+        }
+
+        gameDAO.updateGame(gameID, newGame);
+    }
+
     public GameData[] listGames() throws ResponseException {
         return gameDAO.listGames();
     }

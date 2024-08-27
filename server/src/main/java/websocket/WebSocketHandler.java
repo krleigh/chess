@@ -36,7 +36,7 @@ public class WebSocketHandler {
             switch (userGameCommand.getCommandType()){
                 case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
                 case MAKE_MOVE -> makeMove();
-                case LEAVE -> leave(userGameCommand.getAuthToken());
+                case LEAVE -> leave(userGameCommand.getAuthToken(), userGameCommand.getGameID());
                 case RESIGN -> resign();
             }
         }
@@ -56,9 +56,10 @@ public class WebSocketHandler {
 
     }
 
-    private void leave(String authToken) throws IOException, ResponseException {
+    private void leave(String authToken, Integer gameID) throws IOException, ResponseException {
         var username = userService.getAuth(authToken).username();
         connections.remove(username);
+        gameService.leaveGame(username, gameID);
         var message = String.format("%s left the game.", username);
         var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(username, serverMessage);

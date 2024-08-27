@@ -142,14 +142,10 @@ public class Client {
             }
 
             var gameID = games.get(ID).gameID();
-
-            state = State.GAMEPLAY;
-            ws = new WebSocketFacade(serverUrl, repl, gameID);
-
             server.joinGame(new JoinRequest(gameID , teamColor), authToken);
-            var game = findGame(gameID, server.listGames(authToken).getGames());
-            board = new DrawBoard(game, teamColor);
-            board.draw();
+            state = State.GAMEPLAY;
+            ws = new WebSocketFacade(serverUrl, repl, gameID, teamColor);
+            ws.connect(authToken);
 
             return String.format("Joined game %s", gameID );
         }

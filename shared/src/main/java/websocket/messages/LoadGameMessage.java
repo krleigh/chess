@@ -11,4 +11,8 @@ public class LoadGameMessage extends ServerMessage {
         super.message = message;
         this.game = game;
     }
+
+    public GameData getGame() {
+        return game;
+    }
 }

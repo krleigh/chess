@@ -1,7 +1,10 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.GameData;
+import ui.DrawBoard;
 import websocket.commands.ConnectCommand;
 import websocket.commands.LeaveCommand;
 import websocket.commands.UserGameCommand;
@@ -22,11 +25,14 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     GameHandler gameHandler;
     Integer gameID;
+    ChessGame.TeamColor teamColor;
+    DrawBoard board;
 
-    public WebSocketFacade(String url, GameHandler gameHandler, Integer gameID) throws ResponseException {
+    public WebSocketFacade(String url, GameHandler gameHandler, Integer gameID, ChessGame.TeamColor teamColor) throws ResponseException {
 
         this.gameHandler = gameHandler;
         this.gameID = gameID;
+        this.teamColor = teamColor;
 
         try{
             url = url.replace("http", "ws");
@@ -40,13 +46,12 @@ public class WebSocketFacade extends Endpoint {
                 public void onMessage(String message) {
                     var gson = new Gson();
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
-                    ServerMessage accessMessage = serverMessage;
                     switch (serverMessage.getServerMessageType()) {
-                        case NOTIFICATION -> accessMessage = gson.fromJson(message, NotificationMessage.class);
-                        case LOAD_GAME -> accessMessage = gson.fromJson(message, LoadGameMessage.class);
-                        case ERROR -> accessMessage = gson.fromJson(message, ErrorMessage.class);
+                        case NOTIFICATION -> gameHandler.notify(gson.fromJson(message, NotificationMessage.class));
+                        case LOAD_GAME -> loadGame(gson.fromJson(message, LoadGameMessage.class).getGame());
+                        case ERROR -> gameHandler.notify(gson.fromJson(message, ErrorMessage.class));
                     }
-                    gameHandler.notify(serverMessage);
+
                 }
             });
 
@@ -58,6 +63,23 @@ public class WebSocketFacade extends Endpoint {
 
     @Override
     public void onOpen(Session session, EndpointConfig endpointConfig) {
+    }
+
+    public void connect(String authToken) throws ResponseException {
+        try {
+            var command = new ConnectCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+
+    }
+
+    public void loadGame(GameData game) {
+        gameHandler.updateGame(game);
+        board = new DrawBoard(game, teamColor);
+        System.out.println();
+        board.draw();
     }
 
     public void leave(String authToken) throws ResponseException {
