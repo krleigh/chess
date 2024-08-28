@@ -103,7 +103,8 @@ public class Client {
         for (var game : gameslist.getGames()){
             this.games.put(key, game);
             if (print) {
-                System.out.println(key + " " + game.gameName() + " | white player: " + game.whiteUsername() + " | black player: " + game.blackUsername() + "\n");
+                System.out.println(key + " " + game.gameName() + " | white player: " + game.whiteUsername() +
+                        " | black player: " + game.blackUsername() + "\n");
             }
             ++key;
         }
@@ -124,13 +125,13 @@ public class Client {
         if (params.length == 2) {
 
             ChessGame.TeamColor teamColor;
-            Integer ID;
+            Integer id;
 
-            try{ID = Integer.parseInt(params[0]);}
+            try{id = Integer.parseInt(params[0]);}
             catch (Exception e) { throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");}
 
             listHelper(false);
-            if (!games.containsKey(ID)) { return "Invalid game ID.";}
+            if (!games.containsKey(id)) { return "Invalid game ID.";}
 
 
             if (Objects.equals(params[1], "white")) {
@@ -141,7 +142,7 @@ public class Client {
                 throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");
             }
 
-            var gameID = games.get(ID).gameID();
+            var gameID = games.get(id).gameID();
             server.joinGame(new JoinRequest(gameID , teamColor), authToken);
             state = State.GAMEPLAY;
             ws = new WebSocketFacade(serverUrl, repl, gameID, teamColor);
