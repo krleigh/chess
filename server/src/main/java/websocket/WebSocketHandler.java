@@ -12,7 +12,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
-import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
@@ -80,87 +79,108 @@ public class WebSocketHandler {
     }
 
     private void makeMove(String authToken, Integer gameID, ChessMove move, Session session) throws IOException, ResponseException {
+        //Check for valid auth and get username
         var username = validateAuth(authToken);
         if (Objects.equals(username, "badAuth")) { connections.newSend(session ,
                 new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: Bad auth")); return;}
 
+        //Check for valid gameID and get GameData
         GameData gameData = validateGameID(username, gameID);
         if (gameData == null) {return;}
 
-        ChessGame.TeamColor teamColor = null;
+        //Check that client is not an observer
+        if(notPlayer(username, gameData)) {return;}
 
-        if (Objects.equals(username, gameData.blackUsername())) {
-            teamColor = ChessGame.TeamColor.BLACK;
-        } else if (Objects.equals(username, gameData.whiteUsername())){
-            teamColor = ChessGame.TeamColor.WHITE;
-        }
+        //Check Game Status
+        if (isOver(username, gameData)) {return;}
 
-        if (teamColor == null) { errorMessage(username, "Error: Not a player. Cannot make moves."); return;}
-
+        //Validate move
         ChessGame newGame = gameData.game();
-
         try {newGame.makeMove(move);} catch (InvalidMoveException e) {
             errorMessage(username, "Error: Invalid move");
             return;
         }
 
+        //Check that player moves their own color
+        ChessGame.TeamColor teamColor = getTeamColor(username, gameData);
         if (teamColor != newGame.getBoard().getPiece(move.getEndPosition()).getTeamColor()) {
             errorMessage(username, "Error: Cannot move opponent's pieces");
             return;
         }
 
-
-        GameData newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), newGame);
+        //Update game with move
+        GameData newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
+                gameData.gameName(), newGame, GameData.GameStatus.ONGOING);
         try { gameService.updateGame(gameID, newGameData);} catch (Exception e) { System.out.println(e.getMessage());}
 
+        //All players and observers load game
         loadGame(null, gameID, true);
 
+        //Notify other player and observers of the move
         notification(username, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                 String.format("%s moved %s", username, move)));
 
-        checkGameState(newGame, newGameData);
+        //Check if there is a check, checkmate, or stalemate
+        checksOrMatesCheck(newGame, newGameData);
 
     }
 
     private void leave(String authToken, Integer gameID, Session session) throws IOException, ResponseException {
+        //Check for valid auth and get username
         var username = validateAuth(authToken);
         if (Objects.equals(username, "badAuth")) {connections.newSend(session ,
                 new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: Bad auth")); return;}
 
-        GameData game = validateGameID(username, gameID);
-        if (game == null){return;}
-
-        connections.remove(username);
-        gameService.leaveGame(username, gameID);
-
-        var message = String.format("%s left the game.", username);
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        notification(username, notification);
-    }
-
-    private void resign(String authToken, Integer gameID, Session session) throws IOException {
-        var username = validateAuth(authToken);
-        if (Objects.equals(username, "badAuth")) {connections.newSend(session ,
-                new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: Bad auth")); return;}
-
+        //Check for valid gameID
         GameData gameData = validateGameID(username, gameID);
         if (gameData == null){return;}
 
-        ChessGame.TeamColor teamColor = null;
-
-        if (Objects.equals(username, gameData.blackUsername())) {
-            teamColor = ChessGame.TeamColor.BLACK;
-        } else if (Objects.equals(username, gameData.whiteUsername())){
-            teamColor = ChessGame.TeamColor.WHITE;
+        //If not observer, remove player from game
+        if(getTeamColor(username, gameData)!=null) {
+            //Check Game Status
+            if (isOver(username, gameData)) {return;} else{
+                gameService.leaveGame(username, gameID);
+            }
         }
 
-        if (teamColor == null) { errorMessage(username, "Error: Not a player. Cannot make moves."); return;}
-
-        connections.remove(username);
-
-        var message = String.format("%s resigned the game. Game over.", username);
+        //Notify others
+        var message = String.format("%s left the game.", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         notification(username, notification);
+
+        //Remove connection
+        connections.remove(username);
+    }
+
+    private void resign(String authToken, Integer gameID, Session session) throws IOException {
+        //Check valid auth and get username
+        var username = validateAuth(authToken);
+        if (Objects.equals(username, "badAuth")) {connections.newSend(session ,
+                new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: Bad auth")); return;}
+
+        //Check valid gameID and get GameData
+        GameData gameData = validateGameID(username, gameID);
+        if (gameData == null){return;}
+
+        //Check that client is not an observer
+        if(notPlayer(username, gameData)) {return;}
+
+        //Check Game Status
+        if (isOver(username, gameData)) {return;}
+
+        //Update game
+        try{ gameService.updateGame(gameID, new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
+                gameData.gameName(), gameData.game(), GameData.GameStatus.OVER));} catch (Exception e) { System.out.println(e.getMessage());}
+
+
+
+        //Notify other player and observers
+        var message = String.format("%s resigned the game. Game over.", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        notification(null, notification);
+
+        //Remove player connection
+        connections.remove(username);
 
     }
 
@@ -199,7 +219,33 @@ public class WebSocketHandler {
         return game;
     }
 
-    public void checkGameState(ChessGame newGame, GameData newGameData) throws IOException {
+    public Boolean notPlayer(String username, GameData gameData) throws IOException {
+        ChessGame.TeamColor teamColor = getTeamColor(username, gameData);
+
+        if (teamColor == null) { errorMessage(username, "Error: Not a player. Cannot make moves."); return true;}
+        return false;
+    }
+
+    public ChessGame.TeamColor getTeamColor(String username, GameData gameData) {
+        ChessGame.TeamColor teamColor = null;
+
+        if (Objects.equals(username, gameData.blackUsername())) {
+            teamColor = ChessGame.TeamColor.BLACK;
+        } else if (Objects.equals(username, gameData.whiteUsername())){
+            teamColor = ChessGame.TeamColor.WHITE;
+        }
+
+        return teamColor;
+    }
+
+    public Boolean isOver(String username, GameData gameData) throws IOException {
+        if (gameData.gameStatus()== GameData.GameStatus.OVER){
+            errorMessage(username, "Game over.");
+            return true;
+        } else { return false;}
+    }
+
+    public void checksOrMatesCheck(ChessGame newGame, GameData newGameData) throws IOException {
         String checked = null;
 
         if (newGame.isInCheck(ChessGame.TeamColor.BLACK)){

@@ -45,9 +45,9 @@ public class GameService {
         GameData newGame;
 
         if (color == ChessGame.TeamColor.BLACK) {
-            newGame = new GameData(gameID, oldGame.whiteUsername(), username, oldGame.gameName(), oldGame.game());
+            newGame = new GameData(gameID, oldGame.whiteUsername(), username, oldGame.gameName(), oldGame.game(), GameData.GameStatus.ONGOING);
         } else if (color == ChessGame.TeamColor.WHITE){
-            newGame = new GameData(gameID, username, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
+            newGame = new GameData(gameID, username, oldGame.blackUsername(), oldGame.gameName(), oldGame.game(), GameData.GameStatus.ONGOING);
         } else {
             throw new ResponseException(400, "Error: bad request");
         }
@@ -63,9 +63,9 @@ public class GameService {
         GameData newGame;
 
         if (Objects.equals(username, oldGame.blackUsername())) {
-            newGame = new GameData(gameID, oldGame.whiteUsername(), null, oldGame.gameName(), oldGame.game());
+            newGame = new GameData(gameID, oldGame.whiteUsername(), null, oldGame.gameName(), oldGame.game(), GameData.GameStatus.ONGOING);
         } else if (Objects.equals(username, oldGame.whiteUsername())) {
-            newGame = new GameData(gameID, null, oldGame.blackUsername(), oldGame.gameName(), oldGame.game());
+            newGame = new GameData(gameID, null, oldGame.blackUsername(), oldGame.gameName(), oldGame.game(), GameData.GameStatus.ONGOING);
         } else {
             return;
         }

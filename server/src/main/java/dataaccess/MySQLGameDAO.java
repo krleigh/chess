@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
+import static model.GameData.GameStatus.ONGOING;
 
 public class MySQLGameDAO implements GameDAO {
 
@@ -24,13 +25,13 @@ public class MySQLGameDAO implements GameDAO {
         var statement = "INSERT INTO game (gameName, game) VALUES (?, ?)";
         var json = new Gson().toJson(game);
         var id = executeUpdate(statement, request.gameName(), json);
-        return new GameData(id, null, null, request.gameName(), game);
+        return new GameData(id, null, null, request.gameName(), game, ONGOING);
     }
 
     public GameData[] listGames() throws ResponseException {
         var games = new ArrayList<GameData>();
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game, gameStatus FROM game";
             try (var ps = conn.prepareStatement(statement)) {
                 try (var rs = ps.executeQuery()) {
                     while (rs.next()) {
@@ -48,7 +49,7 @@ public class MySQLGameDAO implements GameDAO {
 
     public GameData getGame(Integer gameID) throws ResponseException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameID=?";
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game, gameStatus FROM game WHERE gameID=?";
             try (var ps = conn.prepareStatement(statement)) {
                 ps.setInt(1, gameID);
                 try (var rs = ps.executeQuery()) {
@@ -68,8 +69,9 @@ public class MySQLGameDAO implements GameDAO {
         var blackUsername = newGame.blackUsername();
         var gameName = newGame.gameName();
         var game = new Gson().toJson(newGame.game());
-        var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
-        executeUpdate(statement, whiteUsername, blackUsername, gameName, game, gameID);
+        var gameStatus = newGame.gameStatus().toString();
+        var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=?, gameStatus=? WHERE gameID=?";
+        executeUpdate(statement, whiteUsername, blackUsername, gameName, game, gameStatus, gameID);
 
 
         return newGame;
@@ -91,7 +93,8 @@ public class MySQLGameDAO implements GameDAO {
         var blackUsername= rs.getString("blackUsername");
         var gameName = rs.getString("gameName");
         var game = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+        var gameStatus = GameData.GameStatus.valueOf(rs.getString("gameStatus"));
+        return new GameData(gameID, whiteUsername, blackUsername, gameName, game, gameStatus);
     }
 
     private int executeUpdate(String statement, Object... params) throws ResponseException {
@@ -125,6 +128,7 @@ public class MySQLGameDAO implements GameDAO {
               `blackUsername` varchar(256) DEFAULT NULL,
               `gameName` varchar(256) NOT NULL,
               `game` TEXT DEFAULT NULL,
+              `gameStatus` varchar(256) DEFAULT 'ONGOING',
               PRIMARY KEY (`gameID`),
               INDEX(gameName)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

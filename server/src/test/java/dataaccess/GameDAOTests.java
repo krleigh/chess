@@ -97,9 +97,11 @@ public class GameDAOTests {
 
         var oldgame = gameDAO.createGame(new CreateRequest("my coolest game"));
         ChessGame newChessGame = new ChessGame();
-        try{ newChessGame.makeMove(new ChessMove(new ChessPosition(2,2), new ChessPosition(3,2), null));}
+        try{ newChessGame.makeMove(new ChessMove(
+                new ChessPosition(2,2), new ChessPosition(3,2), null));}
         catch (Exception e) { System.out.println(e.getMessage());}
-        GameData newGame = new GameData(oldgame.gameID(), oldgame.whiteUsername(), oldgame.blackUsername(), "cool new name", newChessGame);
+        GameData newGame = new GameData(oldgame.gameID(), oldgame.whiteUsername(), oldgame.blackUsername(),
+                "cool new name", newChessGame, GameData.GameStatus.ONGOING);
         gameDAO.updateGame(oldgame.gameID(), newGame);
         assertEquals("cool new name", gameDAO.getGame(oldgame.gameID()).gameName());
         assertNotEquals(oldgame.game(), gameDAO.getGame(oldgame.gameID()).game());

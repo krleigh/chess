@@ -13,7 +13,7 @@ public class MemoryGameDAO implements GameDAO{
     private int nextID = 1;
 
     public GameData createGame(CreateRequest request) throws ResponseException {
-        GameData game = new GameData(nextID++, null, null, request.gameName(), new ChessGame());
+        GameData game = new GameData(nextID++, null, null, request.gameName(), new ChessGame(), GameData.GameStatus.ONGOING);
 
         games.put(game.gameID(), game);
         return game;
