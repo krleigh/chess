@@ -50,4 +50,27 @@ public class WebSocketSessions {
             System.out.println(msg);
         }
     }
+
+
+    public void newSend(Session session, ServerMessage message) throws IOException {
+        Connection connection = null;
+        for (var c : connections.values()) {
+            if (c.session == session) {
+                connection = c;
+            }
+        }
+        if (connection == null) {
+            var msg = String.format("Not connected");
+            System.out.println(msg);
+            return;
+        }
+        if (connection.session.isOpen()) {
+            connection.send(new Gson().toJson(message));
+        } else {
+            connections.remove(connection.username);
+            var msg = String.format("Not connected");
+            System.out.println(msg);
+        }
+    }
+
 }
