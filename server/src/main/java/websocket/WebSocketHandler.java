@@ -1,21 +1,26 @@
 package websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import exception.ResponseException;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import service.UserService;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import javax.websocket.OnMessage;
 import java.io.IOException;
+import java.util.Objects;
 
 @WebSocket
 public class WebSocketHandler {
@@ -33,24 +38,14 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, ResponseException {
-
-//        System.out.println("Received Message: " + message);
-//        UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
-//        switch (userGameCommand.getCommandType()) {
-//            case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
-//            case MAKE_MOVE -> makeMove();
-//            case LEAVE -> leave(userGameCommand.getAuthToken(), userGameCommand.getGameID());
-//            case RESIGN -> resign();
-//        }
-
         try {
-            System.out.println("Received Message: " + message);
+//            System.out.println("Received Message: " + message);
             UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
             switch (userGameCommand.getCommandType()) {
                 case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
-                case MAKE_MOVE -> makeMove();
+                case MAKE_MOVE -> makeMove(userGameCommand.getAuthToken(), userGameCommand.getGameID(), userGameCommand.getMove());
                 case LEAVE -> leave(userGameCommand.getAuthToken(), userGameCommand.getGameID());
-                case RESIGN -> resign();
+                case RESIGN -> resign(userGameCommand.getAuthToken(), userGameCommand.getGameID());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,15 +53,14 @@ public class WebSocketHandler {
         }
 
     @OnWebSocketError
-    public void onError(Throwable error) throws IOException {
+    public void onError(Throwable error) {
         System.err.println("Error: " + error.getMessage());
     }
 
     private void connect(String authToken, Integer gameID, Session session) throws IOException, ResponseException {
 
-        String username;
-        try { username = userService.getAuth(authToken).username(); } catch (Exception e) {
-            username = "badAuth";
+        String username = validateAuth(authToken);
+        if (Objects.equals(username, "badAuth")){
             connections.add(username, session);
             errorMessage(username, "Error: bad auth");
             connections.remove(username);
@@ -75,50 +69,100 @@ public class WebSocketHandler {
 
         connections.add(username, session);
 
-        try { gameService.getGame(gameID);} catch (Exception e) {
-            errorMessage(username, "Error: Invalid game ID");
-            connections.remove(username);
-            return;
-        }
+        GameData game = validateGameID(username, gameID);
+        if (game == null){return;}
 
         var msg = String.format("%s joined the %s", username, gameID.toString());
-        var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
-        connections.broadcast(username, serverMessage);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
+        notification(username, notification);
 
-        var loadMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, gameService.getGame(gameID));
-        connections.send(username, loadMessage);
+        loadGame(username, gameID, false);
     }
 
-    private void makeMove() {
+    private void makeMove(String authToken, Integer gameID, ChessMove move) throws IOException, ResponseException {
+        var username = validateAuth(authToken);
+        if (Objects.equals(username, "badAuth")) {return;}
+
+        GameData gameData = validateGameID(username, gameID);
+        if (gameData == null) {return;}
+
+        ChessGame newGame = gameData.game();
+        try {newGame.makeMove(move);} catch (InvalidMoveException e) { errorMessage(username, "Error: Invalid move");}
+        GameData newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), newGame);
+        gameService.updateGame(gameID, newGameData);
+
+        loadGame(null, gameID, true);
+
+        notification(username, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                String.format("%s moved %s", username, move)));
+
+
 
     }
 
     private void leave(String authToken, Integer gameID) throws IOException, ResponseException {
-        var username = userService.getAuth(authToken).username();
+        var username = validateAuth(authToken);
+        if (Objects.equals(username, "badAuth")) {return;}
+
+        GameData game = validateGameID(username, gameID);
+        if (game == null){return;}
+
         connections.remove(username);
         gameService.leaveGame(username, gameID);
+
         var message = String.format("%s left the game.", username);
-        var serverMessage = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(username, serverMessage);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        notification(username, notification);
     }
 
-    private void resign() {
+    private void resign(String authToken, Integer gameID) throws IOException {
+        var username = validateAuth(authToken);
+        if (Objects.equals(username, "badAuth")) {return;}
+
+        connections.remove(username);
+//        gameService.leaveGame(username, gameID);
+
+        var message = String.format("%s left the game.", username);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        notification(username, notification);
 
     }
 
-    public void load_game() {
-        try {
 
-        } catch (Exception e) {
 
+
+    public void loadGame(String username, Integer gameID, Boolean all) throws IOException, ResponseException {
+        var loadMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, gameService.getGame(gameID));
+        if (all) {
+            connections.broadcast(username, loadMessage);
+        } else {
+            connections.send(username, loadMessage);
         }
+
     }
 
     public void errorMessage(String username, String message) throws IOException {
         connections.send(username, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message));
     }
 
-    public void notification() {
+    public void notification(String username, NotificationMessage notification) throws IOException {
+        connections.broadcast(username, notification);
+    }
 
+
+    public String validateAuth(String authToken) throws IOException {
+        String username = null;
+        try { username = userService.getAuth(authToken).username(); } catch (Exception e) {
+            username = "badAuth";
+        }
+        return username;
+    }
+
+    public GameData validateGameID(String username, Integer gameID) throws IOException {
+        GameData game = null;
+        try { game = gameService.getGame(gameID);} catch (Exception e) {
+            errorMessage(username, "Error: Invalid game ID");
+        }
+        return game;
     }
 }
