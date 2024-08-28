@@ -1,6 +1,8 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import exception.ResponseException;
 import model.GameData;
 
@@ -94,10 +96,14 @@ public class GameDAOTests {
         GameDAO gameDAO = getDataAccess(dbClass);
 
         var oldgame = gameDAO.createGame(new CreateRequest("my coolest game"));
-        GameData newGame = new GameData(oldgame.gameID(), oldgame.whiteUsername(), oldgame.blackUsername(), "cool new name", new ChessGame());
+        ChessGame newChessGame = new ChessGame();
+        try{ newChessGame.makeMove(new ChessMove(new ChessPosition(2,2), new ChessPosition(3,2), null));}
+        catch (Exception e) { System.out.println(e.getMessage());}
+        GameData newGame = new GameData(oldgame.gameID(), oldgame.whiteUsername(), oldgame.blackUsername(), "cool new name", newChessGame);
         gameDAO.updateGame(oldgame.gameID(), newGame);
         assertEquals("cool new name", gameDAO.getGame(oldgame.gameID()).gameName());
         assertNotEquals(oldgame.game(), gameDAO.getGame(oldgame.gameID()).game());
+        assertEquals(newChessGame.getBoard(), gameDAO.getGame(oldgame.gameID()).game().getBoard());
     }
 
     @ParameterizedTest

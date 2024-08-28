@@ -67,9 +67,11 @@ public class MySQLGameDAO implements GameDAO {
         var whiteUsername = newGame.whiteUsername();
         var blackUsername = newGame.blackUsername();
         var gameName = newGame.gameName();
-        var game = new Gson().toJson(newGame);
-        var statement = "UPDATE game SET gameID=?, whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
-        executeUpdate(statement, gameID, whiteUsername, blackUsername, gameName, game, gameID);
+        var game = new Gson().toJson(newGame.game());
+        var statement = "UPDATE game SET whiteUsername=?, blackUsername=?, gameName=?, game=? WHERE gameID=?";
+        executeUpdate(statement, whiteUsername, blackUsername, gameName, game, gameID);
+
+
         return newGame;
     }
 

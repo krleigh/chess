@@ -87,16 +87,65 @@ public class WebSocketHandler {
         if (gameData == null) {return;}
 
         ChessGame newGame = gameData.game();
-        try {newGame.makeMove(move);} catch (InvalidMoveException e) { errorMessage(username, "Error: Invalid move");}
+
+        try {newGame.makeMove(move);} catch (InvalidMoveException e) {
+            errorMessage(username, "Error: Invalid move");
+            return;
+        }
+
+
         GameData newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), newGame);
-        gameService.updateGame(gameID, newGameData);
+        try { gameService.updateGame(gameID, newGameData);} catch (Exception e) { System.out.println(e.getMessage());}
 
         loadGame(null, gameID, true);
 
         notification(username, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                 String.format("%s moved %s", username, move)));
 
+        String checked = null;
 
+        if (newGame.isInCheck(ChessGame.TeamColor.BLACK)){
+            checked = newGameData.blackUsername();
+        } else if (newGame.isInStalemate(ChessGame.TeamColor.WHITE)) {
+            checked = newGameData.whiteUsername();
+        }
+
+        if (checked != null) {
+            notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s is in check!", checked)));
+        }
+
+        String checkedmate = null;
+        String checkermate = null;
+
+        if (newGame.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            checkedmate = newGameData.blackUsername();
+            checkermate = newGameData.whiteUsername();
+        } else if (newGame.isInCheckmate(ChessGame.TeamColor.WHITE)){
+            checkermate = newGameData.blackUsername();
+            checkedmate = newGameData.whiteUsername();
+        }
+
+        if (checkedmate != null) {
+            notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s is in checkmate. Game over. %s wins!", checkedmate, checkermate)));
+        }
+
+        String stale = null;
+        String fresh = null;
+
+        if(newGame.isInStalemate(ChessGame.TeamColor.BLACK)){
+            stale = newGameData.blackUsername();
+            fresh = newGameData.whiteUsername();
+        } else if (newGame.isInStalemate(ChessGame.TeamColor.WHITE)){
+            stale = newGameData.whiteUsername();
+            fresh = newGameData.blackUsername();
+        }
+
+        if(stale != null){
+            notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
+                    String.format("%s is in stalemate. Game Over. %s wins!", stale, fresh)));
+        }
 
     }
 

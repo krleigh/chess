@@ -91,7 +91,7 @@ public class GameService {
         gameDAO.deleteAllGames();
     }
 
-    public void updateGame(Integer gameID, GameData newgame) throws ResponseException {
-        gameDAO.updateGame(gameID, newgame);
+    public void updateGame(Integer gameID, GameData newGame) throws ResponseException {
+        gameDAO.updateGame(gameID, newGame);
     }
 }
