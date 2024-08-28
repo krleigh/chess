@@ -6,26 +6,31 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketSessions {
 
-    public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, HashMap<String, Connection>> connections = new ConcurrentHashMap<>();
 
-    public void add(String username, Session session) {
+    public void add(Integer gameID, String username, Session session) {
         var connection = new Connection(username, session);
-        connections.put(username, connection);
+        if (!connections.containsKey(gameID)){
+            connections.put(gameID, new HashMap<>());
+        }
+        connections.get(gameID).put(username, connection);
     }
 
-    public void remove(String username) {
-        connections.remove(username);
+    public void remove(String username, Integer gameID) {
+        connections.get(gameID).remove(username);
     }
 
 
-    public void broadcast(String excludedUser, ServerMessage message) throws IOException {
+    public void broadcast(String excludedUser, ServerMessage message, Integer gameID) throws IOException {
 //        System.out.println("Sending message: " + message.getMessage());
         var removeList = new ArrayList<Connection>();
-        for (var connection : connections.values()) {
+        for (var connection : connections.get(gameID).values()) {
             if (connection.session.isOpen()) {
                 if (!connection.username.equals(excludedUser)) {
                     connection.send(new Gson().toJson(message));
@@ -40,8 +45,8 @@ public class WebSocketSessions {
         }
     }
 
-    public void send(String user, ServerMessage message) throws IOException {
-        var connection = connections.get(user);
+    public void send(String user, ServerMessage message, Integer gameID) throws IOException {
+        var connection = connections.get(gameID).get(user);
         if (connection.session.isOpen()) {
             connection.send(new Gson().toJson(message));
         } else {
@@ -55,8 +60,10 @@ public class WebSocketSessions {
     public void newSend(Session session, ServerMessage message) throws IOException {
         Connection connection = null;
         for (var c : connections.values()) {
-            if (c.session == session) {
-                connection = c;
+            for (var con : c.values()){
+                if (con.session == session) {
+                    connection = con;
+                }
             }
         }
         if (connection == null) {

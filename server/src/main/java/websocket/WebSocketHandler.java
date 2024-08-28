@@ -60,20 +60,20 @@ public class WebSocketHandler {
 
         String username = validateAuth(authToken);
         if (Objects.equals(username, "badAuth")){
-            connections.add(username, session);
-            errorMessage(username, "Error: bad auth");
-            connections.remove(username);
+            connections.add(gameID, username, session);
+            errorMessage(username, "Error: bad auth", gameID);
+            connections.remove(username, gameID);
             return;
         }
 
-        connections.add(username, session);
+        connections.add(gameID, username, session);
 
         GameData game = validateGameID(username, gameID);
         if (game == null){return;}
 
         var msg = String.format("%s joined the %s", username, gameID.toString());
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
-        notification(username, notification);
+        notification(username, notification, gameID);
 
         loadGame(username, gameID, false);
     }
@@ -97,14 +97,14 @@ public class WebSocketHandler {
         //Validate move
         ChessGame newGame = gameData.game();
         try {newGame.makeMove(move);} catch (InvalidMoveException e) {
-            errorMessage(username, "Error: Invalid move");
+            errorMessage(username, "Error: Invalid move", gameID);
             return;
         }
 
         //Check that player moves their own color
         ChessGame.TeamColor teamColor = getTeamColor(username, gameData);
         if (teamColor != newGame.getBoard().getPiece(move.getEndPosition()).getTeamColor()) {
-            errorMessage(username, "Error: Cannot move opponent's pieces");
+            errorMessage(username, "Error: Cannot move opponent's pieces", gameID);
             return;
         }
 
@@ -118,7 +118,7 @@ public class WebSocketHandler {
 
         //Notify other player and observers of the move
         notification(username, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                String.format("%s moved %s", username, move)));
+                String.format("%s moved %s", username, move)), gameID);
 
         //Check if there is a check, checkmate, or stalemate
         checksOrMatesCheck(newGame, newGameData);
@@ -146,10 +146,10 @@ public class WebSocketHandler {
         //Notify others
         var message = String.format("%s left the game.", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        notification(username, notification);
+        notification(username, notification, gameID);
 
         //Remove connection
-        connections.remove(username);
+        connections.remove(username, gameID);
     }
 
     private void resign(String authToken, Integer gameID, Session session) throws IOException {
@@ -177,10 +177,10 @@ public class WebSocketHandler {
         //Notify other player and observers
         var message = String.format("%s resigned the game. Game over.", username);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        notification(null, notification);
+        notification(null, notification, gameID);
 
         //Remove player connection
-        connections.remove(username);
+        connections.remove(username, gameID);
 
     }
 
@@ -188,18 +188,18 @@ public class WebSocketHandler {
     public void loadGame(String username, Integer gameID, Boolean all) throws IOException, ResponseException {
         var loadMessage = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, null, gameService.getGame(gameID));
         if (all) {
-            connections.broadcast(username, loadMessage);
+            connections.broadcast(username, loadMessage, gameID);
         } else {
-            connections.send(username, loadMessage);
+            connections.send(username, loadMessage, gameID);
         }
     }
 
-    public void errorMessage(String username, String message) throws IOException {
-        connections.send(username, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message));
+    public void errorMessage(String username, String message, Integer gameID) throws IOException {
+        connections.send(username, new ErrorMessage(ServerMessage.ServerMessageType.ERROR, message), gameID);
     }
 
-    public void notification(String username, NotificationMessage notification) throws IOException {
-        connections.broadcast(username, notification);
+    public void notification(String username, NotificationMessage notification, Integer gameID) throws IOException {
+        connections.broadcast(username, notification, gameID);
     }
 
 
@@ -214,7 +214,7 @@ public class WebSocketHandler {
     public GameData validateGameID(String username, Integer gameID) throws IOException {
         GameData game = null;
         try { game = gameService.getGame(gameID);} catch (Exception e) {
-            errorMessage(username, "Error: Invalid game ID");
+            errorMessage(username, "Error: Invalid game ID", gameID);
         }
         return game;
     }
@@ -222,7 +222,7 @@ public class WebSocketHandler {
     public Boolean notPlayer(String username, GameData gameData) throws IOException {
         ChessGame.TeamColor teamColor = getTeamColor(username, gameData);
 
-        if (teamColor == null) { errorMessage(username, "Error: Not a player. Cannot make moves."); return true;}
+        if (teamColor == null) { errorMessage(username, "Error: Not a player. Cannot make moves.", gameData.gameID()); return true;}
         return false;
     }
 
@@ -240,7 +240,7 @@ public class WebSocketHandler {
 
     public Boolean isOver(String username, GameData gameData) throws IOException {
         if (gameData.gameStatus()== GameData.GameStatus.OVER){
-            errorMessage(username, "Game over.");
+            errorMessage(username, "Game over.", gameData.gameID());
             return true;
         } else { return false;}
     }
@@ -256,7 +256,7 @@ public class WebSocketHandler {
 
         if (checked != null) {
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s is in check!", checked)));
+                    String.format("%s is in check!", checked)), newGameData.gameID());
         }
 
         String checkedmate = null;
@@ -272,7 +272,7 @@ public class WebSocketHandler {
 
         if (checkedmate != null) {
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s is in checkmate. Game over. %s wins!", checkedmate, checkermate)));
+                    String.format("%s is in checkmate. Game over. %s wins!", checkedmate, checkermate)), newGameData.gameID());
         }
 
         String stale = null;
@@ -288,7 +288,7 @@ public class WebSocketHandler {
 
         if(stale != null){
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
-                    String.format("%s is in stalemate. Game Over. %s wins!", stale, fresh)));
+                    String.format("%s is in stalemate. Game Over. %s wins!", stale, fresh)), newGameData.gameID());
         }
     }
 }
