@@ -23,7 +23,7 @@ public class Client {
     private State state = State.LOGGED_OUT;
 
 
-    private HashMap<Integer, GameData> games = new HashMap<>();
+    private final HashMap<Integer, GameData> games = new HashMap<>();
     private DrawBoard board;
 
 
@@ -177,7 +177,7 @@ public class Client {
                 throw new ResponseException(400, "Error: Invalid game id");
             } else {
                 board = new DrawBoard(game, ChessGame.TeamColor.WHITE);
-                board.draw();
+                DrawBoard.draw();
             }
             state = State.OBSERVE;
             return String.format("Observing game %s", gameID );

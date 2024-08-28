@@ -79,7 +79,7 @@ public class WebSocketFacade extends Endpoint {
         gameHandler.updateGame(game);
         board = new DrawBoard(game, teamColor);
         System.out.println();
-        board.draw();
+        DrawBoard.draw();
     }
 
     public void leave(String authToken) throws ResponseException {
