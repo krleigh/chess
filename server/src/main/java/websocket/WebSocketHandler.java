@@ -280,8 +280,7 @@ public class WebSocketHandler {
         if (checkedmate != null) {
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                     String.format("%s is in checkmate. Game over. %s wins!", checkedmate, checkermate)), newGameData.gameID());
-            try{ gameService.updateGame(newGameData.gameID(), new GameData(newGameData.gameID(), newGameData.whiteUsername(), newGameData.blackUsername(),
-                    newGameData.gameName(), newGameData.game(), GameData.GameStatus.OVER));} catch (Exception e) { System.out.println(e.getMessage());}
+            makeGameOver(newGameData);
         }
 
         String stale = null;
@@ -298,9 +297,14 @@ public class WebSocketHandler {
         if(stale != null){
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                     String.format("%s is in stalemate. Game Over. %s wins!", stale, fresh)), newGameData.gameID());
-            try{ gameService.updateGame(newGameData.gameID(), new GameData(newGameData.gameID(), newGameData.whiteUsername(), newGameData.blackUsername(),
-                    newGameData.gameName(), newGameData.game(), GameData.GameStatus.OVER));} catch (Exception e) { System.out.println(e.getMessage());}
+            makeGameOver(newGameData);
         }
+    }
+
+    public void makeGameOver(GameData newGameData){
+        try{ gameService.updateGame(newGameData.gameID(), new GameData(newGameData.gameID(),
+                newGameData.whiteUsername(), newGameData.blackUsername(), newGameData.gameName(),
+                newGameData.game(), GameData.GameStatus.OVER));} catch (Exception e) { System.out.println(e.getMessage());}
     }
 
 
