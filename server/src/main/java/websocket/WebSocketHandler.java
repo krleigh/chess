@@ -36,7 +36,7 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, ResponseException {
         try {
-            System.out.println("Received Message: " + message);
+//            System.out.println("Received Message: " + message);
             UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
             switch (userGameCommand.getCommandType()) {
                 case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
@@ -69,7 +69,13 @@ public class WebSocketHandler {
         GameData game = validateGameID(username, gameID);
         if (game == null){return;}
 
-        var msg = String.format("%s joined the %s", username, gameID.toString());
+        var teamColor = getTeamColor(username, gameService.getGame(gameID));
+        String msg;
+        if (teamColor == null) {
+            msg = String.format("%s joined %s as an observer", username, gameService.getGame(gameID).gameName());
+        } else {
+            msg = String.format("%s joined %s as %s", username, gameService.getGame(gameID).gameName(), teamColor);
+        }
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, msg);
         notification(username, notification, gameID);
 
@@ -81,12 +87,12 @@ public class WebSocketHandler {
         var username = validateAuth(authToken);
         if (Objects.equals(username, "badAuth")) { connections.newSend(session ,
                 new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: Bad auth")); return;}
-        System.out.println(username);
+
 
         //Check for valid gameID and get GameData
         GameData gameData = validateGameID(username, gameID);
         if (gameData == null) {return;}
-        System.out.println(gameID);
+
 
         //Check that client is not an observer
         if(notPlayer(username, gameData)) {return;}
@@ -95,7 +101,6 @@ public class WebSocketHandler {
         if (isOver(username, gameData)) {return;}
 
         //Validate move
-        System.out.println(move);
         ChessGame newGame = gameData.game();
         try {newGame.makeMove(move);} catch (InvalidMoveException e) {
             errorMessage(username, String.format("Error: Invalid move. %s", e.getMessage() ), gameID);
@@ -275,6 +280,8 @@ public class WebSocketHandler {
         if (checkedmate != null) {
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                     String.format("%s is in checkmate. Game over. %s wins!", checkedmate, checkermate)), newGameData.gameID());
+            try{ gameService.updateGame(newGameData.gameID(), new GameData(newGameData.gameID(), newGameData.whiteUsername(), newGameData.blackUsername(),
+                    newGameData.gameName(), newGameData.game(), GameData.GameStatus.OVER));} catch (Exception e) { System.out.println(e.getMessage());}
         }
 
         String stale = null;
@@ -291,6 +298,8 @@ public class WebSocketHandler {
         if(stale != null){
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                     String.format("%s is in stalemate. Game Over. %s wins!", stale, fresh)), newGameData.gameID());
+            try{ gameService.updateGame(newGameData.gameID(), new GameData(newGameData.gameID(), newGameData.whiteUsername(), newGameData.blackUsername(),
+                    newGameData.gameName(), newGameData.game(), GameData.GameStatus.OVER));} catch (Exception e) { System.out.println(e.getMessage());}
         }
     }
 
