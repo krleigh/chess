@@ -187,7 +187,7 @@ public class WebSocketHandler {
         notification(null, notification, gameID);
 
         //Remove player connection
-        connections.remove(username, gameID);
+//        connections.remove(username, gameID);
 
     }
 

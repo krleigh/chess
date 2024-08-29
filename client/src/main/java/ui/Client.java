@@ -14,6 +14,7 @@ import websocket.WebSocketFacade;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class Client {
     private String authToken;
@@ -244,9 +245,17 @@ public class Client {
 
     public String resign() throws ResponseException {
         assertGamePlay();
-        ws.resign(authToken);
-        gameName = null;
-        return "Attempting to resign.";
+        System.out.println("Are you sure you want to resign? Y/N");
+        Scanner scanner = new Scanner(System.in);
+        String line = scanner.nextLine();
+        if (Objects.equals(line, "Y")){
+            ws.resign(authToken);
+            return "Attempting to resign.";
+        } else {
+            return "Cancelled resign.";
+        }
+
+
     }
 
     private GameData findGame(Integer gameID, GameData[] games) {
