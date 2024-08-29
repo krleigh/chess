@@ -98,10 +98,13 @@ public class WebSocketFacade extends Endpoint {
     }
 
     public void show(String authToken, ChessPosition position){
-        Collection<ChessMove> moves = gameData.game().validMoves(position);
         Collection<ChessPosition> validMoves = new ArrayList<>();
-        for (var move : moves) {
-            validMoves.add(move.getEndPosition());
+
+        if (gameData.game().getTeamTurn() == gameData.game().getBoard().getPiece(position).getTeamColor()){
+            Collection<ChessMove> moves = gameData.game().validMoves(position);
+            for (var move : moves) {
+                validMoves.add(move.getEndPosition());
+            }
         }
         DrawBoard.draw(validMoves, position);
 

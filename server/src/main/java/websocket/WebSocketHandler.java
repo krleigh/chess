@@ -120,8 +120,8 @@ public class WebSocketHandler {
         try {gameService.updateGame(gameID, newGameData);} catch (Exception e) { System.out.println(e.getMessage());}
 
         //All players and observers load game
-        loadGame(username, gameID, false);
-        notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "testing"), gameID);
+        loadGame(null, gameID, true);
+
 
         //Notify other player and observers of the move
         notification(username, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
@@ -142,8 +142,8 @@ public class WebSocketHandler {
         GameData gameData = validateGameID(username, gameID);
         if (gameData == null){return;}
 
-        //If not observer, remove player from game
-        if(getTeamColor(username, gameData)!=null) {
+        //If not observer and game is not over, remove player from game
+        if(getTeamColor(username, gameData)!=null && gameData.gameStatus()!= GameData.GameStatus.OVER) {
             //Check Game Status
             if (isOver(username, gameData)) {return;} else{
                 gameService.leaveGame(username, gameID);

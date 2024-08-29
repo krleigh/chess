@@ -114,7 +114,7 @@ public class Client {
             this.games.put(key, game);
             if (print) {
                 System.out.println(key + " " + game.gameName() + " | white player: " + game.whiteUsername() +
-                        " | black player: " + game.blackUsername() + "\n");
+                        " | black player: " + game.blackUsername() + " | game status: " + game.gameStatus() + "\n");
             }
             ++key;
         }
@@ -201,7 +201,7 @@ public class Client {
         ws.leave(authToken);
         state = State.LOGGED_IN;
         gameName = null;
-        return "Left game.";
+        return "Leaving game.";
     }
 
     public String show(String...params) throws ResponseException {
@@ -246,7 +246,7 @@ public class Client {
         assertGamePlay();
         ws.resign(authToken);
         gameName = null;
-        return "Resigned game.";
+        return "Attempting to resign.";
     }
 
     private GameData findGame(Integer gameID, GameData[] games) {
