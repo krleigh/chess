@@ -96,6 +96,7 @@ public class ChessGame {
                 }
 
             } else {
+                if (teamColor != mTeamTurn){ throw new InvalidMoveException("wrong turn");}
                 throw new InvalidMoveException();
             }
         } else {

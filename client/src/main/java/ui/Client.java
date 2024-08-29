@@ -1,6 +1,9 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import exception.ResponseException;
 import model.GameData;
 import serverfacade.ServerFacade;
@@ -24,6 +27,7 @@ public class Client {
 
 
     private final HashMap<Integer, GameData> games = new HashMap<>();
+    private String gameName;
     private DrawBoard board;
 
 
@@ -48,7 +52,8 @@ public class Client {
                 case "logout" -> logout();
                 case "redraw" -> redraw();
                 case "leave" -> leave();
-                case "move" -> move();
+                case "show" -> show(params);
+                case "move" -> move(params);
                 case "resign" -> resign();
                 case "clear" -> clear();
                 case "quit" -> "quit";
@@ -61,11 +66,12 @@ public class Client {
 
     public String register(String... params) throws ResponseException {
         if (params.length == 3) {
+            assertLoggedOut();
             state = State.LOGGED_IN;
             RegisterResult result = server.registerUser(new RegisterRequest(params[0], params[1], params[2]));
             authToken = result.authToken();
             username = result.username();
-            return String.format("You registered as %s.", params[0]);
+            return String.format("You registered as %s.", params[0]) + "\n" + help();
         }
         throw new ResponseException(400, "Expected: <username> <password> <email>");
     }
@@ -79,17 +85,20 @@ public class Client {
             LoginResult result = server.login(new LoginRequest(params[0], params[1]));
             username = params[0];
             authToken = result.authToken();
-            return String.format("You logged in as %s.", params[0]);
+            return String.format("You logged in as %s.", params[0])+ "\n" + help();
         }
         throw new ResponseException(400, "Expected: <username> <password>");
     }
 
-    public String logout() throws ResponseException {
+
+    public String create(String... params) throws ResponseException {
         assertLoggedIn();
-        server.logout(authToken);
-        authToken = null;
-        state = State.LOGGED_OUT;
-        return String.format("%s logged out", username);
+        if (params.length == 1) {
+            CreateResult result = server.createGame(new CreateRequest(params[0]), authToken);
+            return String.format("Game %S created.", params[0]);
+        } else {
+            throw new ResponseException(400, "Expected: <game name>, names cannot include spaces");
+        }
     }
 
     public String list() throws ResponseException {
@@ -111,32 +120,23 @@ public class Client {
         }
     }
 
-    public String create(String... params) throws ResponseException {
-        assertLoggedIn();
-        if (params.length == 1) {
-            CreateResult result = server.createGame(new CreateRequest(params[0]), authToken);
-            return String.format("Game %S created.", params[0]);
-        } else {
-            throw new ResponseException(400, "Expected: <game name>, names cannot include spaces");
-        }
-    }
-
     public String join(String...params) throws ResponseException {
-      assertLoggedIn();
+        assertLoggedIn();
         if (params.length == 2) {
 
             ChessGame.TeamColor teamColor;
             Integer id;
 
             try{id = Integer.parseInt(params[0]);}
-            catch (Exception e) { throw new ResponseException(400, "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");}
+            catch (Exception e) {throw new ResponseException(400,
+                    "Expected: <game id> <team color>, for team color, input \"white\" or \"black\"");}
 
             listHelper(false);
             if (!games.containsKey(id)) { return "Invalid game ID.";}
 
 
             if (Objects.equals(params[1], "white")) {
-                 teamColor = ChessGame.TeamColor.WHITE;
+                teamColor = ChessGame.TeamColor.WHITE;
             } else if (Objects.equals(params[1], "black")) {
                 teamColor = ChessGame.TeamColor.BLACK;
             } else {
@@ -144,39 +144,25 @@ public class Client {
             }
 
             var gameID = games.get(id).gameID();
-            server.joinGame(new JoinRequest(gameID , teamColor), authToken);
+            if (teamColor == ChessGame.TeamColor.WHITE && Objects.equals(games.get(id).whiteUsername(), username) ||
+                    teamColor == ChessGame.TeamColor.BLACK && Objects.equals(games.get(id).blackUsername(), username)){
+
+            } else {
+                server.joinGame(new JoinRequest(gameID , teamColor), authToken);
+            }
             state = State.GAMEPLAY;
             ws = new WebSocketFacade(serverUrl, repl, gameID, teamColor);
             ws.connect(authToken);
 
-            return String.format("Joined game %s", gameID );
+            this.gameName = games.get(id).gameName();
+
+            return String.format("Joined game %s", gameID)+ "\n" + help();
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input black or white");
     }
 
-    public String redraw() throws ResponseException {
-        assertGamePlay();
-        ws.redraw(authToken);
-        return "Board redrawn";
-    }
-
-    public String leave() throws ResponseException {
-        assertGamePlay();
-        ws.leave(authToken);
-        state = State.LOGGED_IN;
-        return "Left game.";
-    }
-
-    public String move(String...params) throws ResponseException {
-        return "Moved.";
-    }
-
-    public String resign() throws ResponseException {
-        return "Resigned game.";
-    }
-
     private String observe(String...params) throws ResponseException {
-       assertLoggedIn();
+        assertLoggedIn();
         if (params.length == 1) {
             Integer gameID = Integer.parseInt(params[0]);
             var games = server.listGames(authToken);
@@ -184,13 +170,83 @@ public class Client {
             if (game == null) {
                 throw new ResponseException(400, "Error: Invalid game id");
             } else {
-                board = new DrawBoard(game, ChessGame.TeamColor.WHITE);
-                DrawBoard.draw();
+                ws = new WebSocketFacade(serverUrl, repl, gameID, ChessGame.TeamColor.WHITE);
+                ws.connect(authToken);
+                gameName = game.gameName();
             }
             state = State.OBSERVE;
-            return String.format("Observing game %s", gameID );
+
+            return String.format("Observing game %s", gameName)+ "\n" + help();
         }
         throw new ResponseException(400, "Expected: <game id>");
+    }
+
+    public String logout() throws ResponseException {
+        assertLoggedIn();
+        server.logout(authToken);
+        authToken = null;
+        state = State.LOGGED_OUT;
+        return String.format("%s logged out", username);
+    }
+
+
+    public String redraw() throws ResponseException {
+        assertObserveOrGameplay();
+        ws.redraw(authToken);
+        return "Board redrawn";
+    }
+
+    public String leave() throws ResponseException {
+        assertObserveOrGameplay();
+        ws.leave(authToken);
+        state = State.LOGGED_IN;
+        gameName = null;
+        return "Left game.";
+    }
+
+    public String show(String...params) throws ResponseException {
+        assertObserveOrGameplay();
+        ChessPosition position = makeChessPosition(params[0]);
+        ws.show(authToken, position);
+        return String.format("Displaying valid moves for %s", position);
+    }
+
+    public String move(String...params) throws ResponseException {
+        assertGamePlay();
+        ChessMove move = makeChessMove(params[0]);
+        ws.move(authToken, move);
+        return String.format("Attempting move %s", move);
+    }
+
+    public ChessMove makeChessMove(String move) {
+        String[] position = move.split(">");
+        ChessPosition start = makeChessPosition(position[0]);
+        ChessPosition end = makeChessPosition(position[1]);
+
+        ChessPiece.PieceType promP = null;
+
+        if (position.length == 3){
+            String piece = position[2];
+            if (Objects.equals(piece, "queen")){ promP = ChessPiece.PieceType.QUEEN;}
+            if (Objects.equals(piece, "rook")){ promP = ChessPiece.PieceType.ROOK;}
+            if (Objects.equals(piece, "bishop")){ promP = ChessPiece.PieceType.BISHOP;}
+            if (Objects.equals(piece, "knight")){ promP = ChessPiece.PieceType.KNIGHT;}
+        }
+
+        return new ChessMove(start, end, promP);
+    }
+
+    public ChessPosition makeChessPosition(String position) {
+        Integer column = position.charAt(0) - 'a' + 1;
+        Integer row = Character.getNumericValue(position.charAt(1));
+        return new ChessPosition(row, column);
+    }
+
+    public String resign() throws ResponseException {
+        assertGamePlay();
+        ws.resign(authToken);
+        gameName = null;
+        return "Resigned game.";
     }
 
     private GameData findGame(Integer gameID, GameData[] games) {
@@ -204,6 +260,7 @@ public class Client {
 
     private String clear() throws ResponseException {
         server.clear();
+        state = State.LOGGED_OUT;
         return "Database cleared";
     }
 
@@ -243,7 +300,9 @@ public class Client {
     }
 
     private void assertLoggedIn() throws ResponseException {
-        if (state == State.LOGGED_OUT) {
+        if (state != State.LOGGED_IN) {
+            if (state == State.GAMEPLAY || state == State.OBSERVE) {
+                throw new ResponseException(400, "Error: Please exit gameplay or observe mode");}
             throw new ResponseException(400, "Error: Please log in");
         }
     }
@@ -251,6 +310,20 @@ public class Client {
     private void assertGamePlay() throws ResponseException {
         if (state != State.GAMEPLAY) {
             throw new ResponseException(400, "Error: not in gameplay mode");
+        }
+    }
+
+    private void assertLoggedOut() throws ResponseException {
+        if (state != State.LOGGED_OUT) {
+            if (state == State.GAMEPLAY || state == State.OBSERVE) {
+                throw new ResponseException(400, "Error: Please exit gameplay or observe mode");}
+            throw new ResponseException(400, "Error: Please log out");
+        }
+    }
+
+    private void assertObserveOrGameplay() throws ResponseException {
+        if (state != State.OBSERVE && state != State.GAMEPLAY) {
+            throw new ResponseException(400, "Error: not in gameplay or observe mode");
         }
     }
 

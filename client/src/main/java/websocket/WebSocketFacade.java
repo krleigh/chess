@@ -1,13 +1,13 @@
 package websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameData;
 import ui.DrawBoard;
-import websocket.commands.ConnectCommand;
-import websocket.commands.LeaveCommand;
-import websocket.commands.UserGameCommand;
+import websocket.commands.*;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class WebSocketFacade extends Endpoint {
 
@@ -45,12 +47,13 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new javax.websocket.MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
+                    System.out.println("Received Message: " + message);
                     var gson = new Gson();
                     ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
                     switch (serverMessage.getServerMessageType()) {
                         case NOTIFICATION -> gameHandler.notify(gson.fromJson(message, NotificationMessage.class));
                         case LOAD_GAME -> loadGame(gson.fromJson(message, LoadGameMessage.class).getGame());
-                        case ERROR -> gameHandler.notify(gson.fromJson(message, ErrorMessage.class));
+                        case ERROR -> gameHandler.notifyError(gson.fromJson(message, ErrorMessage.class));
                     }
 
                 }
@@ -76,18 +79,6 @@ public class WebSocketFacade extends Endpoint {
 
     }
 
-    public void redraw(String authToken) {
-        loadGame(gameData);
-    }
-
-    public void loadGame(GameData game) {
-        this.gameData = game;
-        gameHandler.updateGame(game);
-        board = new DrawBoard(game, teamColor);
-        System.out.println();
-        DrawBoard.draw();
-    }
-
     public void leave(String authToken) throws ResponseException {
         try {
             var command = new LeaveCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
@@ -97,12 +88,44 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void move() throws ResponseException {
+    public void move(String authToken, ChessMove move) throws ResponseException {
+        try {
+            var command = new MakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE, authToken, gameID, move);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
+    public void show(String authToken, ChessPosition position){
+        Collection<ChessMove> moves = gameData.game().validMoves(position);
+        Collection<ChessPosition> validMoves = new ArrayList<>();
+        for (var move : moves) {
+            validMoves.add(move.getEndPosition());
+        }
+        DrawBoard.draw(validMoves, position);
 
     }
 
-    public void resign() throws ResponseException {
+    public void resign(String authToken) throws ResponseException {
+        try {
+            var command = new ResignCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
 
+    public void redraw(String authToken) {
+        loadGame(gameData);
+    }
+
+    public void loadGame(GameData game) {
+        this.gameData = game;
+        gameHandler.updateGame(game);
+        board = new DrawBoard(game, teamColor);
+        System.out.println();
+        DrawBoard.draw(null, null);
     }
 
 }

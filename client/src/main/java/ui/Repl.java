@@ -3,6 +3,7 @@ package ui;
 
 import model.GameData;
 import websocket.GameHandler;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -50,6 +51,9 @@ public class Repl implements GameHandler {
     @Override
     public void notify(ServerMessage serverMessage) {
         System.out.println(SET_TEXT_COLOR_RED + serverMessage.getMessage());
+    }
+    public void notifyError(ErrorMessage errorMessage) {
+        System.out.println(SET_TEXT_COLOR_RED + errorMessage.getErrorMessage());
     }
 
     @Override

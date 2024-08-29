@@ -62,8 +62,7 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "from " + mStart +
-                " to " + mEnd +
-                ", " + mPromP + "\n";
+        if (mPromP == null) { return "from " + mStart + " to " + mEnd + "\n";}
+        else { return "from " + mStart + " to " + mEnd + ", " + mPromP + "\n";}
     }
 }

@@ -19,7 +19,7 @@ public class UserGameCommand {
 
     private final Integer gameID;
 
-    String move;
+    ChessMove move;
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
         this.commandType = commandType;
@@ -46,7 +46,7 @@ public class UserGameCommand {
         return gameID;
     }
 
-    public String getMove() { return move;}
+    public ChessMove getMove() { return move;}
 
     @Override
     public boolean equals(Object o) {

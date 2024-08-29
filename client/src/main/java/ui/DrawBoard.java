@@ -2,12 +2,15 @@ package ui;
 
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
@@ -18,6 +21,7 @@ public class DrawBoard {
 
     private static GameData game;
     private static ChessGame.TeamColor color;
+    ;
 
     public DrawBoard(GameData game, ChessGame.TeamColor color) {
         DrawBoard.game = game;
@@ -25,20 +29,21 @@ public class DrawBoard {
     }
 
 
-    public static void draw(){
+    public static void draw(Collection<ChessPosition> validMoves, ChessPosition position){
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
 
         drawHeaders(out);
 
-        drawChessBoard(out);
+        drawChessBoard(out, validMoves, position);
 
         drawHeaders(out);
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
     }
+
 
     private static void drawHeaders(PrintStream out) {
 
@@ -76,14 +81,15 @@ public class DrawBoard {
 
     }
 
-    private static void drawChessBoard(PrintStream out) {
+    private static void drawChessBoard(PrintStream out, Collection<ChessPosition> validMoves, ChessPosition position) {
         if (color == ChessGame.TeamColor.BLACK) {
-            reversibleChessBoard(out, BOARD_SIZE_IN_SQUARES-3, BOARD_SIZE_IN_SQUARES-1, -1, -1, -1);
+            reversibleChessBoard(out, validMoves, position, BOARD_SIZE_IN_SQUARES-3, BOARD_SIZE_IN_SQUARES-1, -1, -1, -1);
         } else {
-            reversibleChessBoard(out, 0, 0, BOARD_SIZE_IN_SQUARES-2, BOARD_SIZE_IN_SQUARES, +1);
+            reversibleChessBoard(out, validMoves, position, 0, 0, BOARD_SIZE_IN_SQUARES-2, BOARD_SIZE_IN_SQUARES, +1);
         }
     }
-    private static void reversibleChessBoard(PrintStream out, int startRow, int startCol, int endRow, int endCol, int step) {
+    private static void reversibleChessBoard(PrintStream out, Collection<ChessPosition> validMoves, ChessPosition position,
+                                             int startRow, int startCol, int endRow, int endCol, int step) {
         for (int boardRow = startRow; boardRow != endRow; boardRow += step ) {
 
             for (int boardCol = startCol; boardCol != endCol; boardCol += step) {
@@ -92,20 +98,33 @@ public class DrawBoard {
                     out.print(SET_TEXT_COLOR_WHITE);
                     out.print("\u2003" + (BOARD_SIZE_IN_SQUARES-3-boardRow+1) +  "\u2003");
                 } else {
-                    drawSquares(out, BOARD_SIZE_IN_SQUARES-3-boardRow, boardCol);
+                    drawSquares(out, validMoves, position, BOARD_SIZE_IN_SQUARES-3-boardRow, boardCol);
                 }
             }
             setBlack(out);
             out.println();
         }
     }
-    private static void drawSquares(PrintStream out, int boardRow, int boardCol) {
+    private static void drawSquares(PrintStream out, Collection<ChessPosition> validMoves, ChessPosition position,
+                                    int boardRow, int boardCol) {
 
         if (boardCol % 2 == 0 && boardRow %2 == 0 || boardCol % 2 != 0 && boardRow % 2 != 0) {
             setGrey(out);
+            if (validMoves != null && validMoves.contains(new ChessPosition(boardRow+1, boardCol))){
+                out.print(SET_BG_COLOR_GREEN);
+            }
+            if(position !=null && Objects.equals(position, new ChessPosition(boardRow+1, boardCol))) {
+                out.print(SET_BG_COLOR_BLUE);
+            }
             printPiece(out, boardRow, boardCol);
         } else {
             setDarkGrey(out);
+            if (validMoves != null && validMoves.contains(new ChessPosition(boardRow+1, boardCol))){
+                out.print(SET_BG_COLOR_DARK_GREEN);
+            }
+            if(position !=null && Objects.equals(position, new ChessPosition(boardRow+1, boardCol))) {
+                out.print(SET_BG_COLOR_BLUE);
+            }
             printPiece(out, boardRow, boardCol);
         }
     }

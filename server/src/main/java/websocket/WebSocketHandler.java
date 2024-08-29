@@ -36,7 +36,7 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException, ResponseException {
         try {
-//            System.out.println("Received Message: " + message);
+            System.out.println("Received Message: " + message);
             UserGameCommand userGameCommand = new Gson().fromJson(message, UserGameCommand.class);
             switch (userGameCommand.getCommandType()) {
                 case CONNECT -> connect(userGameCommand.getAuthToken(), userGameCommand.getGameID(), session);
@@ -76,15 +76,17 @@ public class WebSocketHandler {
         loadGame(username, gameID, false);
     }
 
-    private void makeMove(String authToken, Integer gameID, String move, Session session) throws IOException, ResponseException {
+    private void makeMove(String authToken, Integer gameID, ChessMove move, Session session) throws IOException, ResponseException {
         //Check for valid auth and get username
         var username = validateAuth(authToken);
         if (Objects.equals(username, "badAuth")) { connections.newSend(session ,
                 new ErrorMessage(ServerMessage.ServerMessageType.ERROR,"Error: Bad auth")); return;}
+        System.out.println(username);
 
         //Check for valid gameID and get GameData
         GameData gameData = validateGameID(username, gameID);
         if (gameData == null) {return;}
+        System.out.println(gameID);
 
         //Check that client is not an observer
         if(notPlayer(username, gameData)) {return;}
@@ -92,19 +94,17 @@ public class WebSocketHandler {
         //Check Game Status
         if (isOver(username, gameData)) {return;}
 
-        //Convert move to ChessMove
-        ChessMove chessMove = makeChessMove(move);
-
         //Validate move
+        System.out.println(move);
         ChessGame newGame = gameData.game();
-        try {newGame.makeMove(chessMove);} catch (InvalidMoveException e) {
-            errorMessage(username, "Error: Invalid move", gameID);
+        try {newGame.makeMove(move);} catch (InvalidMoveException e) {
+            errorMessage(username, String.format("Error: Invalid move. %s", e.getMessage() ), gameID);
             return;
         }
 
         //Check that player moves their own color
         ChessGame.TeamColor teamColor = getTeamColor(username, gameData);
-        if (teamColor != newGame.getBoard().getPiece(chessMove.getEndPosition()).getTeamColor()) {
+        if (teamColor != newGame.getBoard().getPiece(move.getEndPosition()).getTeamColor()) {
             errorMessage(username, "Error: Cannot move opponent's pieces", gameID);
             return;
         }
@@ -112,10 +112,11 @@ public class WebSocketHandler {
         //Update game with move
         GameData newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
                 gameData.gameName(), newGame, GameData.GameStatus.ONGOING);
-        try { gameService.updateGame(gameID, newGameData);} catch (Exception e) { System.out.println(e.getMessage());}
+        try {gameService.updateGame(gameID, newGameData);} catch (Exception e) { System.out.println(e.getMessage());}
 
         //All players and observers load game
-        loadGame(null, gameID, true);
+        loadGame(username, gameID, false);
+        notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "testing"), gameID);
 
         //Notify other player and observers of the move
         notification(username, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
@@ -293,24 +294,5 @@ public class WebSocketHandler {
         }
     }
 
-    public ChessMove makeChessMove(String move) {
-        String[] position = move.split(">");
-        Integer startRow = position[0].charAt(0) - 'a' + 1;
-        Integer startColumn = Character.getNumericValue(position[0].charAt(1));
 
-        Integer endRow = position[1].charAt(0) - 'a' +1;
-        Integer endColumn = Character.getNumericValue(position[1].charAt(1));
-
-        ChessPiece.PieceType promP = null;
-
-        if (position.length == 3){
-            String piece = position[2];
-            if (Objects.equals(piece, "queen")){ promP = ChessPiece.PieceType.QUEEN;}
-            if (Objects.equals(piece, "rook")){ promP = ChessPiece.PieceType.ROOK;}
-            if (Objects.equals(piece, "bishop")){ promP = ChessPiece.PieceType.BISHOP;}
-            if (Objects.equals(piece, "knight")){ promP = ChessPiece.PieceType.KNIGHT;}
-        }
-
-        return new ChessMove(new ChessPosition(startRow, startColumn), new ChessPosition(endRow, endColumn), promP);
-    }
 }
