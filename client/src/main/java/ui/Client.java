@@ -46,6 +46,7 @@ public class Client {
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout();
+                case "redraw" -> redraw();
                 case "leave" -> leave();
                 case "move" -> move();
                 case "resign" -> resign();
@@ -151,6 +152,12 @@ public class Client {
             return String.format("Joined game %s", gameID );
         }
         throw new ResponseException(400, "Expected: <game id> <team color>. For team color, input black or white");
+    }
+
+    public String redraw() throws ResponseException {
+        assertGamePlay();
+        ws.redraw(authToken);
+        return "Board redrawn";
     }
 
     public String leave() throws ResponseException {

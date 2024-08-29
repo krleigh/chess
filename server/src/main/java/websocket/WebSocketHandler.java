@@ -1,8 +1,6 @@
 package websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.InvalidMoveException;
+import chess.*;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.GameData;
@@ -78,7 +76,7 @@ public class WebSocketHandler {
         loadGame(username, gameID, false);
     }
 
-    private void makeMove(String authToken, Integer gameID, ChessMove move, Session session) throws IOException, ResponseException {
+    private void makeMove(String authToken, Integer gameID, String move, Session session) throws IOException, ResponseException {
         //Check for valid auth and get username
         var username = validateAuth(authToken);
         if (Objects.equals(username, "badAuth")) { connections.newSend(session ,
@@ -94,16 +92,19 @@ public class WebSocketHandler {
         //Check Game Status
         if (isOver(username, gameData)) {return;}
 
+        //Convert move to ChessMove
+        ChessMove chessMove = makeChessMove(move);
+
         //Validate move
         ChessGame newGame = gameData.game();
-        try {newGame.makeMove(move);} catch (InvalidMoveException e) {
+        try {newGame.makeMove(chessMove);} catch (InvalidMoveException e) {
             errorMessage(username, "Error: Invalid move", gameID);
             return;
         }
 
         //Check that player moves their own color
         ChessGame.TeamColor teamColor = getTeamColor(username, gameData);
-        if (teamColor != newGame.getBoard().getPiece(move.getEndPosition()).getTeamColor()) {
+        if (teamColor != newGame.getBoard().getPiece(chessMove.getEndPosition()).getTeamColor()) {
             errorMessage(username, "Error: Cannot move opponent's pieces", gameID);
             return;
         }
@@ -290,5 +291,26 @@ public class WebSocketHandler {
             notification(null, new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION,
                     String.format("%s is in stalemate. Game Over. %s wins!", stale, fresh)), newGameData.gameID());
         }
+    }
+
+    public ChessMove makeChessMove(String move) {
+        String[] position = move.split(">");
+        Integer startRow = position[0].charAt(0) - 'a' + 1;
+        Integer startColumn = Character.getNumericValue(position[0].charAt(1));
+
+        Integer endRow = position[1].charAt(0) - 'a' +1;
+        Integer endColumn = Character.getNumericValue(position[1].charAt(1));
+
+        ChessPiece.PieceType promP = null;
+
+        if (position.length == 3){
+            String piece = position[2];
+            if (Objects.equals(piece, "queen")){ promP = ChessPiece.PieceType.QUEEN;}
+            if (Objects.equals(piece, "rook")){ promP = ChessPiece.PieceType.ROOK;}
+            if (Objects.equals(piece, "bishop")){ promP = ChessPiece.PieceType.BISHOP;}
+            if (Objects.equals(piece, "knight")){ promP = ChessPiece.PieceType.KNIGHT;}
+        }
+
+        return new ChessMove(new ChessPosition(startRow, startColumn), new ChessPosition(endRow, endColumn), promP);
     }
 }

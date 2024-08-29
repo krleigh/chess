@@ -27,6 +27,7 @@ public class WebSocketFacade extends Endpoint {
     Integer gameID;
     ChessGame.TeamColor teamColor;
     DrawBoard board;
+    GameData gameData;
 
     public WebSocketFacade(String url, GameHandler gameHandler, Integer gameID, ChessGame.TeamColor teamColor) throws ResponseException {
 
@@ -75,7 +76,12 @@ public class WebSocketFacade extends Endpoint {
 
     }
 
+    public void redraw(String authToken) {
+        loadGame(gameData);
+    }
+
     public void loadGame(GameData game) {
+        this.gameData = game;
         gameHandler.updateGame(game);
         board = new DrawBoard(game, teamColor);
         System.out.println();
